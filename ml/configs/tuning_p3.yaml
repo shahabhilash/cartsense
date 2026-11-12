@@ -1,0 +1,32 @@
+# Phase 3 hyperparameter search, stage 1: model parameters, with a negligible
+# popularity prior (1e-3, the default). Evaluated on val only.
+# Run: python -m cartsense_ml.experiments.run --config ml/configs/tuning_p3.yaml --stage val
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+report_group: tuning_p3
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - {name: item_knn, label: knn_n50_s10, params: {neighbors: 50, shrink: 10}}
+  - {name: item_knn, label: knn_n200_s10, params: {neighbors: 200, shrink: 10}}
+  - {name: item_knn, label: knn_n50_s100, params: {neighbors: 50, shrink: 100}}
+  - {name: item_knn, label: knn_n200_s100, params: {neighbors: 200, shrink: 100}}
+
+  - {name: als, label: als_f64_r0.05_a10, params: {factors: 64, regularization: 0.05, alpha: 10}}
+  - {name: als, label: als_f64_r0.05_a40, params: {factors: 64, regularization: 0.05, alpha: 40}}
+  - {name: als, label: als_f64_r1_a10, params: {factors: 64, regularization: 1.0, alpha: 10}}
+  - {name: als, label: als_f64_r1_a40, params: {factors: 64, regularization: 1.0, alpha: 40}}
+  - {name: als, label: als_f128_r0.05_a10, params: {factors: 128, regularization: 0.05, alpha: 10}}
+  - {name: als, label: als_f128_r0.05_a40, params: {factors: 128, regularization: 0.05, alpha: 40}}
+  - {name: als, label: als_f128_r1_a10, params: {factors: 128, regularization: 1.0, alpha: 10}}
+  - {name: als, label: als_f128_r1_a40, params: {factors: 128, regularization: 1.0, alpha: 40}}
+
+  - {name: content_tfidf, label: content_hl180, params: {half_life_days: 180}}
+  - {name: content_tfidf, label: content_hl730, params: {half_life_days: 730}}

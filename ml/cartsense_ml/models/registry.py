@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any
 
 from cartsense_ml.models.base import Recommender
+from cartsense_ml.models.collaborative import ALS, ItemKNN
+from cartsense_ml.models.content import ContentTfidf
 from cartsense_ml.models.popularity import CategoryPopular, MostPopular, RandomRecommender, RecentPopular
 
 MODELS: dict[str, type[Recommender]] = {
@@ -12,6 +14,9 @@ MODELS: dict[str, type[Recommender]] = {
     "most_popular": MostPopular,
     "recent_popular": RecentPopular,
     "category_popular": CategoryPopular,
+    "content_tfidf": ContentTfidf,
+    "item_knn": ItemKNN,
+    "als": ALS,
 }
 
 

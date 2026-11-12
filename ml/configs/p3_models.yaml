@@ -1,0 +1,25 @@
+# Phase 3: content-based and collaborative filtering, with settings chosen on val
+# (highest NDCG@10 in reports/tuning_p3_val.md). Each model appears twice:
+#   <model>      best stage-1 parameters, negligible popularity prior (1e-3)
+#   <model>_pop  same parameters + recent-popularity prior with weight 1.0
+# Run:
+#   python -m cartsense_ml.experiments.run --config ml/configs/p3_models.yaml --stage val
+#   python -m cartsense_ml.experiments.run --config ml/configs/p3_models.yaml --stage test
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - {name: als, label: als, params: {factors: 128, regularization: 1.0, alpha: 40}}
+  - {name: als, label: als_pop, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 1.0}}
+  - {name: item_knn, label: item_knn, params: {neighbors: 50, shrink: 100}}
+  - {name: item_knn, label: item_knn_pop, params: {neighbors: 50, shrink: 100, popularity_weight: 1.0}}
+  - {name: content_tfidf, label: content_tfidf, params: {half_life_days: 730}}
+  - {name: content_tfidf, label: content_tfidf_pop, params: {half_life_days: 730, popularity_weight: 1.0}}

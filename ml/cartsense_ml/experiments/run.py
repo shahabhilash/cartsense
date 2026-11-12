@@ -48,6 +48,9 @@ class ExperimentConfig:
     batch_size: int
     mlflow: dict[str, str] | None
     models: list[ModelSpec]
+    # Results of a named group (e.g. hyperparameter tuning) are kept apart from
+    # the main comparison table: reports/results/<group>/<stage>/
+    report_group: str | None = None
 
 
 def load_experiment_config(path: Path, root: Path = REPO_ROOT) -> ExperimentConfig:
@@ -67,6 +70,7 @@ def load_experiment_config(path: Path, root: Path = REPO_ROOT) -> ExperimentConf
         batch_size=int(raw.get("batch_size", 2048)),
         mlflow=raw.get("mlflow"),
         models=models,
+        report_group=raw.get("report_group"),
     )
 
 
@@ -92,7 +96,13 @@ def run_experiment(
         stage, len(target), int(target.warm.sum()), int((~target.warm).sum()), int(ds.available.sum()),
     )
 
-    results_dir = data_cfg.paths.reports_dir / "results" / stage
+    reports = data_cfg.paths.reports_dir
+    if cfg.report_group:
+        results_dir = reports / "results" / cfg.report_group / stage
+        table_path = reports / f"{cfg.report_group}_{stage}.md"
+    else:
+        results_dir = reports / "results" / stage
+        table_path = reports / f"results_{stage}.md"
     results_dir.mkdir(parents=True, exist_ok=True)
     revision = git_revision(root)
 
@@ -134,12 +144,13 @@ def run_experiment(
 
         if mlflow is not None:
             with mlflow.start_run(run_name=f"{spec.label}-{stage}"):
-                mlflow.set_tags({"model": spec.name, "label": spec.label, "stage": stage, "git_revision": revision})
+                mlflow.set_tags({"model": spec.name, "label": spec.label, "stage": stage,
+                                 "git_revision": revision, "report_group": cfg.report_group or "main"})
                 mlflow.log_params({**model.params(), "k_values": cfg.k_values, "cutoff_ms": ds.cutoff_ms})
                 mlflow.log_metrics(flatten_metrics(result))
                 mlflow.log_artifact(str(results_dir / f"{spec.label}.json"))
 
-    write_results_table(results_dir, data_cfg.paths.reports_dir / f"results_{stage}.md", cfg.k_values)
+    write_results_table(results_dir, table_path, cfg.k_values)
     return results
 
 

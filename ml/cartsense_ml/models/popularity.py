@@ -53,6 +53,15 @@ def recency_weighted_counts(ds: InteractionDataset, half_life_days: float) -> np
     return np.bincount(ds.history["item_idx"].to_numpy(), weights=weights, minlength=ds.n_items)
 
 
+def normalized_recent_popularity(ds: InteractionDataset, half_life_days: float = 180.0) -> np.ndarray:
+    """Recency-weighted popularity scaled to [0, 1]. Personalised models add a
+    small multiple of it as a prior: it serves users without history and
+    breaks ties between items the model scores equally (often all zeros)."""
+    pop = recency_weighted_counts(ds, half_life_days)
+    peak = pop.max()
+    return (pop / peak if peak > 0 else pop).astype(np.float32)
+
+
 class RecentPopular(MostPopular):
     name = "recent_popular"
 
@@ -86,8 +95,7 @@ class CategoryPopular(Recommender):
         self.fallback_weight = fallback_weight
 
     def _fit(self, ds: InteractionDataset) -> None:
-        pop = recency_weighted_counts(ds, self.half_life_days)
-        self.pop = (pop / pop.max() if pop.max() > 0 else pop).astype(np.float32)
+        self.pop = normalized_recent_popularity(ds, self.half_life_days)
 
         platforms = [platform_of(c) or UNKNOWN_PLATFORM for c in ds.products["categories"]]
         self.platform_names, self.item_platform = np.unique(platforms, return_inverse=True)

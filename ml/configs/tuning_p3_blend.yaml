@@ -1,0 +1,43 @@
+# Phase 3 hyperparameter search, stage 2 (val only).
+# Starts from the best stage-1 setting of each model and
+#  (a) extends the two trends seen in stage 1 (higher ALS alpha, higher kNN shrink),
+#  (b) adds a larger recent-popularity prior: score = model score + w * popularity,
+#      where popularity is scaled to [0, 1].
+# Run: python -m cartsense_ml.experiments.run --config ml/configs/tuning_p3_blend.yaml --stage val
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+report_group: tuning_p3
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - {name: als, label: als_f128_r1_a100, params: {factors: 128, regularization: 1.0, alpha: 100}}
+  - {name: item_knn, label: knn_n50_s300, params: {neighbors: 50, shrink: 300}}
+
+  - {name: als, label: als_best_pop0.05, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 0.05}}
+  - {name: als, label: als_best_pop0.2, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 0.2}}
+  - {name: als, label: als_best_pop0.5, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 0.5}}
+  - {name: als, label: als_best_pop1, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 1.0}}
+
+  - {name: item_knn, label: knn_best_pop0.05, params: {neighbors: 50, shrink: 100, popularity_weight: 0.05}}
+  - {name: item_knn, label: knn_best_pop0.2, params: {neighbors: 50, shrink: 100, popularity_weight: 0.2}}
+  - {name: item_knn, label: knn_best_pop0.5, params: {neighbors: 50, shrink: 100, popularity_weight: 0.5}}
+  - {name: item_knn, label: knn_best_pop1, params: {neighbors: 50, shrink: 100, popularity_weight: 1.0}}
+
+  - {name: content_tfidf, label: content_best_pop0.05, params: {half_life_days: 730, popularity_weight: 0.05}}
+  - {name: content_tfidf, label: content_best_pop0.2, params: {half_life_days: 730, popularity_weight: 0.2}}
+  - {name: content_tfidf, label: content_best_pop0.5, params: {half_life_days: 730, popularity_weight: 0.5}}
+  - {name: content_tfidf, label: content_best_pop1, params: {half_life_days: 730, popularity_weight: 1.0}}
+
+  # The best weights were at the edge of the grid (1.0), so extend it
+  - {name: als, label: als_best_pop2, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 2.0}}
+  - {name: als, label: als_best_pop4, params: {factors: 128, regularization: 1.0, alpha: 40, popularity_weight: 4.0}}
+  - {name: item_knn, label: knn_best_pop2, params: {neighbors: 50, shrink: 100, popularity_weight: 2.0}}
+  - {name: content_tfidf, label: content_best_pop2, params: {half_life_days: 730, popularity_weight: 2.0}}
+  - {name: content_tfidf, label: content_best_pop4, params: {half_life_days: 730, popularity_weight: 4.0}}
