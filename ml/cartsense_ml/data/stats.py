@@ -17,9 +17,9 @@ def _quantiles(counts: pd.Series) -> dict[str, float]:
     q = counts.quantile([0.5, 0.9, 0.99])
     return {
         "min": int(counts.min()),
-        "median": float(q.loc[0.5]),
-        "p90": float(q.loc[0.9]),
-        "p99": float(q.loc[0.99]),
+        "median": round(float(q.loc[0.5]), 2),
+        "p90": round(float(q.loc[0.9]), 2),
+        "p99": round(float(q.loc[0.99]), 2),
         "max": int(counts.max()),
         "mean": round(float(counts.mean()), 3),
     }
