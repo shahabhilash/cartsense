@@ -72,20 +72,27 @@ class Recommender(ABC):
         if k > int(ds.available.sum()):
             raise ValueError(f"k={k} exceeds the {int(ds.available.sum())} recommendable items")
 
-        unavailable = ~ds.available
+        # Rank only recommendable columns: smaller arrays, and no large block of
+        # identical -inf values for the partition step to wade through.
+        avail_idx = np.flatnonzero(ds.available)
+        position = np.full(ds.n_items, -1, dtype=np.int64)
+        position[avail_idx] = np.arange(avail_idx.size)
+
         out = np.empty((len(user_idx), k), dtype=np.int64)
         for start in range(0, len(user_idx), batch_size):
             batch = user_idx[start : start + batch_size]
-            scores = np.array(self.score(batch), dtype=np.float32, copy=True)
-            if scores.shape != (len(batch), ds.n_items):
-                raise ValueError(f"{self.name}.score returned shape {scores.shape}")
-            scores[:, unavailable] = -np.inf
+            full = self.score(batch)
+            if full.shape != (len(batch), ds.n_items):
+                raise ValueError(f"{self.name}.score returned shape {full.shape}")
+            scores = np.asarray(full, dtype=np.float32)[:, avail_idx]  # fancy indexing copies
             if exclude_seen:
                 warm = np.flatnonzero(batch >= 0)
                 if warm.size:
                     rows, cols = ds.matrix[batch[warm]].nonzero()
-                    scores[warm[rows], cols] = -np.inf
-            out[start : start + len(batch)] = top_k(scores, k)
+                    cols = position[cols]
+                    keep = cols >= 0
+                    scores[warm[rows[keep]], cols[keep]] = -np.inf
+            out[start : start + len(batch)] = avail_idx[top_k(scores, k)]
         return out
 
 
