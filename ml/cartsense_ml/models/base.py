@@ -45,6 +45,11 @@ class Recommender(ABC):
         """Hyperparameters to log with the experiment."""
         return {"seed": self.seed}
 
+    def diagnostics(self) -> dict[str, Any]:
+        """Extra facts about the fitted model saved with the results
+        (e.g. training curves or feature importances)."""
+        return {}
+
     # ------------------------------------------------------------------ #
     # Shared behaviour
     # ------------------------------------------------------------------ #
@@ -72,28 +77,45 @@ class Recommender(ABC):
         if k > int(ds.available.sum()):
             raise ValueError(f"k={k} exceeds the {int(ds.available.sum())} recommendable items")
 
-        # Rank only recommendable columns: smaller arrays, and no large block of
-        # identical -inf values for the partition step to wade through.
-        avail_idx = np.flatnonzero(ds.available)
-        position = np.full(ds.n_items, -1, dtype=np.int64)
-        position[avail_idx] = np.arange(avail_idx.size)
-
         out = np.empty((len(user_idx), k), dtype=np.int64)
         for start in range(0, len(user_idx), batch_size):
             batch = user_idx[start : start + batch_size]
-            full = self.score(batch)
-            if full.shape != (len(batch), ds.n_items):
-                raise ValueError(f"{self.name}.score returned shape {full.shape}")
-            scores = np.asarray(full, dtype=np.float32)[:, avail_idx]  # fancy indexing copies
-            if exclude_seen:
-                warm = np.flatnonzero(batch >= 0)
-                if warm.size:
-                    rows, cols = ds.matrix[batch[warm]].nonzero()
-                    cols = position[cols]
-                    keep = cols >= 0
-                    scores[warm[rows[keep]], cols[keep]] = -np.inf
-            out[start : start + len(batch)] = avail_idx[top_k(scores, k)]
+            out[start : start + len(batch)] = self.top_k_from_scores(batch, self.score(batch), k, exclude_seen)
         return out
+
+    def top_k_from_scores(
+        self, batch: np.ndarray, full_scores: np.ndarray, k: int, exclude_seen: bool = True
+    ) -> np.ndarray:
+        """Top-k recommendable items from already computed scores for ``batch``.
+        Lets a caller (the hybrid ranker) reuse one ``score`` call for both
+        candidate retrieval and features."""
+        ds = self.ds
+        if full_scores.shape != (len(batch), ds.n_items):
+            raise ValueError(f"{self.name}.score returned shape {full_scores.shape}")
+        # Rank only recommendable columns: smaller arrays, and no large block of
+        # identical -inf values for the partition step to wade through.
+        avail_idx = self._available_idx()
+        scores = np.asarray(full_scores, dtype=np.float32)[:, avail_idx]  # fancy indexing copies
+        if exclude_seen:
+            warm = np.flatnonzero(batch >= 0)
+            if warm.size:
+                rows, cols = ds.matrix[batch[warm]].nonzero()
+                cols = self._position()[cols]
+                keep = cols >= 0
+                scores[warm[rows[keep]], cols[keep]] = -np.inf
+        return avail_idx[top_k(scores, k)]
+
+    def _available_idx(self) -> np.ndarray:
+        if getattr(self, "_avail_cache", None) is None or self._avail_cache[0] is not self.ds:
+            avail_idx = np.flatnonzero(self.ds.available)
+            position = np.full(self.ds.n_items, -1, dtype=np.int64)
+            position[avail_idx] = np.arange(avail_idx.size)
+            self._avail_cache = (self.ds, avail_idx, position)
+        return self._avail_cache[1]
+
+    def _position(self) -> np.ndarray:
+        self._available_idx()
+        return self._avail_cache[2]
 
 
 def top_k(scores: np.ndarray, k: int) -> np.ndarray:

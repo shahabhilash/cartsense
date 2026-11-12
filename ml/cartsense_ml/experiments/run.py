@@ -133,6 +133,7 @@ def run_experiment(
             "cutoff_ms": ds.cutoff_ms,
             "fit_seconds": round(fit_seconds, 3),
             **result,
+            "diagnostics": model.diagnostics(),
         }
         (results_dir / f"{spec.label}.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
         results[spec.label] = result
