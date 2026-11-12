@@ -232,6 +232,8 @@ __marimo__/
 /artifacts/
 /mlruns/
 /mlruns.db
+*.db
+*.sqlite
 /mlartifacts/
 *.pt
 *.pth
