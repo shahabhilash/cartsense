@@ -223,15 +223,15 @@ __marimo__/
 # CartSense project rules
 # ---------------------------------------------------------------
 # Datasets (raw, intermediate and processed) are never committed
-data/
+/data/
 *.parquet
 *.csv.gz
 *.jsonl.gz
 
 # Model binaries and experiment tracking
-artifacts/
-mlruns/
-mlartifacts/
+/artifacts/
+/mlruns/
+/mlartifacts/
 *.pt
 *.pth
 *.ckpt
