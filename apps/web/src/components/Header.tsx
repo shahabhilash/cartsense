@@ -1,12 +1,9 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api, getToken, logEvent, setToken, type User } from "@/lib/api";
 
 export function Header() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [q, setQ] = useState("");
 
@@ -19,7 +16,7 @@ export function Header() {
     e.preventDefault();
     if (!q.trim()) return;
     logEvent({ event_type: "search", query: q.trim() });
-    router.push(`/products?q=${encodeURIComponent(q.trim())}`);
+    navigate(`/products?q=${encodeURIComponent(q.trim())}`);
   }
 
   function logout() {
@@ -31,7 +28,7 @@ export function Header() {
   return (
     <header className="border-b bg-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
-        <Link href="/" className="text-lg font-bold text-indigo-700">
+        <Link to="/" className="text-lg font-bold text-indigo-700">
           CartSense
         </Link>
         <form onSubmit={search} className="order-last flex w-full sm:order-none sm:w-auto sm:flex-1">
@@ -44,15 +41,15 @@ export function Header() {
           />
         </form>
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/products">Browse</Link>
-          <Link href="/wishlist">Wishlist</Link>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link to="/products">Browse</Link>
+          <Link to="/wishlist">Wishlist</Link>
+          <Link to="/dashboard">Dashboard</Link>
           {user ? (
             <button onClick={logout} className="text-gray-600" title="Sign out">
               {user.display_name} · Sign out
             </button>
           ) : (
-            <Link href="/login" className="font-medium text-indigo-700">
+            <Link to="/login" className="font-medium text-indigo-700">
               Sign in
             </Link>
           )}

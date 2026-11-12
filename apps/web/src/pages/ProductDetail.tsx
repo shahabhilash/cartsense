@@ -1,12 +1,10 @@
-"use client";
-
-import { useParams } from "next/navigation";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProductCard, ProductThumb } from "@/components/ProductCard";
 import { api, formatPrice, getToken, logEvent, type Product, type ProductDetail } from "@/lib/api";
 
-export default function ProductPage() {
-  const { id } = useParams<{ id: string }>();
+export default function ProductDetail() {
+  const { id = "" } = useParams<{ id: string }>();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [similar, setSimilar] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);

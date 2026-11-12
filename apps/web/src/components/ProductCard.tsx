@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { formatPrice, logEvent, type Product, type Reason } from "@/lib/api";
 
@@ -16,7 +14,6 @@ const PLATFORM_COLOURS: Record<string, string> = {
 
 export function ProductThumb({ product }: { product: Product }) {
   if (product.image_url) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={product.image_url} alt="" className="h-32 w-full rounded object-contain bg-white" />;
   }
   const colour = PLATFORM_COLOURS[product.platform ?? ""] ?? "bg-gray-500";
@@ -53,7 +50,7 @@ export function ProductCard({
   return (
     <div className="flex flex-col rounded-lg border bg-white p-3 shadow-sm">
       <Link
-        href={`/products/${product.id}${impressionId ? `?imp=${impressionId}` : ""}`}
+        to={`/products/${product.id}${impressionId ? `?imp=${impressionId}` : ""}`}
         onClick={() => logEvent({ event_type: "click", product_id: product.id, impression_id: impressionId })}
         className="flex-1"
       >

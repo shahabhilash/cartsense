@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { api, getToken, type RecList } from "@/lib/api";
@@ -30,7 +28,7 @@ export default function Home() {
         </div>
         {!getToken() && (
           <p className="mt-1 text-sm text-gray-600">
-            <Link href="/login" className="text-indigo-700 underline">Sign in or try a demo shopper</Link> to see
+            <Link to="/login" className="text-indigo-700 underline">Sign in or try a demo shopper</Link> to see
             personal recommendations.
           </p>
         )}
@@ -45,7 +43,7 @@ export default function Home() {
         <h2 className="text-lg font-semibold">Shop by platform</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {platforms.map((p) => (
-            <Link key={p.platform} href={`/products?platform=${encodeURIComponent(p.platform)}`}
+            <Link key={p.platform} to={`/products?platform=${encodeURIComponent(p.platform)}`}
               className="rounded-full border bg-white px-3 py-1 text-sm hover:bg-gray-50">
               {p.platform} <span className="text-gray-400">({p.products})</span>
             </Link>

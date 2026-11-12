@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
 import { ProductCard, ReasonList } from "@/components/ProductCard";
 import { formatPrice, type Product } from "@/lib/api";
@@ -32,12 +33,17 @@ describe("ReasonList", () => {
 });
 
 describe("ProductCard", () => {
-  it("hides reasons until Why this? is clicked, and shows a placeholder instead of an image", () => {
-    render(<ProductCard product={product} reasons={[{ type: "similar", text: "Similar to Mario" }]} />);
+  it("hides reasons until Why this? is clicked, and links to the product page", () => {
+    render(
+      <MemoryRouter>
+        <ProductCard product={product} reasons={[{ type: "similar", text: "Similar to Mario" }]} impressionId="imp-1" />
+      </MemoryRouter>,
+    );
     expect(screen.queryByText("Similar to Mario")).toBeNull();
     fireEvent.click(screen.getByText("Why this?"));
     expect(screen.getByText("Similar to Mario")).toBeTruthy();
-    expect(screen.getByText("Nintendo Switch")).toBeTruthy();
+    expect(screen.getByText("Nintendo Switch")).toBeTruthy(); // placeholder tile, no image
     expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByRole("link").getAttribute("href")).toBe("/products/P1?imp=imp-1");
   });
 });

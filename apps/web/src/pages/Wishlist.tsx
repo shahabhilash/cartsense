@@ -1,11 +1,9 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { api, getToken, type Product } from "@/lib/api";
 
-export default function WishlistPage() {
+export default function Wishlist() {
   const [items, setItems] = useState<Product[] | null>(null);
   const [signedIn, setSignedIn] = useState(true);
 
@@ -20,7 +18,7 @@ export default function WishlistPage() {
   if (!signedIn)
     return (
       <p>
-        <Link href="/login" className="text-indigo-700 underline">
+        <Link to="/login" className="text-indigo-700 underline">
           Sign in
         </Link>{" "}
         to see your wishlist.

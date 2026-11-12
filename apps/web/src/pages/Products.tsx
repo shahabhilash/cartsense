@@ -1,15 +1,12 @@
-"use client";
-
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
 import { api, type Product } from "@/lib/api";
 
 type Page = { items: Product[]; total: number; page: number; page_size: number };
 
-function Browse() {
-  const params = useSearchParams();
-  const router = useRouter();
+export default function Products() {
+  const [params, setParams] = useSearchParams();
   const [data, setData] = useState<Page | null>(null);
   const [error, setError] = useState<string | null>(null);
   const q = params.get("q") ?? "";
@@ -28,7 +25,7 @@ function Browse() {
   function go(update: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
     Object.entries(update).forEach(([k, v]) => (v ? next.set(k, v) : next.delete(k)));
-    router.push(`/products?${next}`);
+    setParams(next);
   }
 
   const pages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
@@ -64,13 +61,5 @@ function Browse() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function ProductsPage() {
-  return (
-    <Suspense>
-      <Browse />
-    </Suspense>
   );
 }

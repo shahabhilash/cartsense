@@ -1,6 +1,6 @@
 // Typed client for the CartSense REST API.
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
 export type Product = {
   id: string;

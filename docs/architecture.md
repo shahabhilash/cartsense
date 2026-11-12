@@ -12,7 +12,7 @@ flowchart LR
     subgraph Online["Online"]
         G[(PostgreSQL)]
         H[FastAPI /api/v1]
-        I[Next.js store]
+        I[React store<br/>Vite + React Router]
     end
     E -- load_data --> G
     F -- offline metrics --> G

@@ -2,7 +2,7 @@
 
 **A video game store with a built-in, explainable recommendation engine.**
 
-CartSense is a full-stack e-commerce application (Next.js + FastAPI) whose
+CartSense is a full-stack e-commerce application (React + FastAPI) whose
 recommendations come from a machine-learning pipeline trained on
 **814,533 real Amazon reviews**. Every recommendation answers "Why this?",
 and every one the store shows is logged, so each model version can be compared
@@ -74,7 +74,7 @@ flowchart LR
     B --> F[Evaluation<br/>MLflow]
     E --> G[(PostgreSQL)]
     G <--> H[FastAPI /api/v1]
-    H <--> I[Next.js store]
+    H <--> I[React store<br/>Vite]
     J[External store] -- API key --> H
 ```
 
@@ -89,7 +89,7 @@ viewed) → **popularity** for guests. Details and design tradeoffs:
 |---|---|
 | Machine learning | Python, pandas, PyArrow, scikit-learn (TF-IDF), implicit (ALS), PyTorch (NCF), XGBoost (LambdaMART), MLflow |
 | Backend | FastAPI, SQLAlchemy 2, Pydantic, PostgreSQL / SQLite, JWT, bcrypt |
-| Frontend | Next.js 14, TypeScript, Tailwind CSS, Recharts |
+| Frontend | React 18, TypeScript, Vite, React Router, Tailwind CSS, Recharts |
 | Quality and ops | pytest, Vitest, Testing Library, GitHub Actions, Docker, docker-compose |
 
 ## Project structure
@@ -107,7 +107,7 @@ cartsense/
 │   ├── configs/            # YAML experiment configs (data, baselines, tuning, final models)
 │   └── tests/
 ├── services/api/           # FastAPI app, routers, data loader, tests
-├── apps/web/               # Next.js storefront and dashboard
+├── apps/web/               # React (Vite) storefront and dashboard
 ├── docs/                   # architecture, data pipeline, evaluation, deployment
 ├── reports/                # generated dataset stats and evaluation results
 └── docker-compose.yml
@@ -181,8 +181,8 @@ All three suites run in GitHub Actions on every push.
 
 ## Deployment
 
-The store deploys to **Vercel** and the API and PostgreSQL to **Render** (or
-Railway). The step-by-step guide, including loading data into a hosted
+The store is a static React build that deploys to **Vercel** or Netlify.
+The API and PostgreSQL deploy to **Render** (or Railway). The step-by-step guide, including loading data into a hosted
 database, is in [docs/deployment.md](docs/deployment.md). Local PostgreSQL:
 `docker compose up --build`.
 

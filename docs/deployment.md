@@ -18,7 +18,7 @@ pip install -e ".[dev]"
 python -m app.load_data --export-dir ../../artifacts/export --results-dir ../../reports/results/test
 uvicorn app.main:app --reload --port 8000            # docs at http://localhost:8000/docs
 
-# Store
+# Store (React + Vite)
 cd apps/web
 npm install
 npm run dev                                          # http://localhost:3000
@@ -55,8 +55,12 @@ against the container's database instead (step 4.3 with the local URL).
    With 2,000 demo users, the export is roughly 25k products, about 250k
    similar-item rows and 40k recommendation rows. That fits within free-tier
    storage limits; reduce `--demo-users` if it doesn't.
-4. **Store:** on Vercel, import the repository with root directory
-   `apps/web` and set `NEXT_PUBLIC_API_URL` to the Render API URL.
+4. **Store:** on Vercel (or Netlify), import the repository with root
+   directory `apps/web`, framework preset **Vite**, and set `VITE_API_URL`
+   to the Render API URL. The store is a static single-page app.
+   `vercel.json` sends every path to `index.html`, so React Router handles
+   deep links. Alternatively, build the `apps/web/Dockerfile`, which serves
+   the static files with nginx.
 5. **Partner API key** (optional):
    `python -m app.load_data --create-api-key "my-store"`. The key is
    printed once.

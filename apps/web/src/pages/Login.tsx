@@ -1,11 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { api, setToken, type DemoUser, type User } from "@/lib/api";
 
 type Token = { access_token: string; user: User };
 
-export default function LoginPage() {
+export default function Login() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
