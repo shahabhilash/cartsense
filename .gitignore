@@ -231,6 +231,7 @@ __marimo__/
 # Model binaries and experiment tracking
 /artifacts/
 /mlruns/
+/mlruns.db
 /mlartifacts/
 *.pt
 *.pth
