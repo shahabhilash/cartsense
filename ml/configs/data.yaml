@@ -1,0 +1,30 @@
+# Data pipeline configuration (Phase 1).
+# Paths are relative to the repository root.
+
+category: Video_Games
+seed: 42
+
+sources:
+  base_url: https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023
+  # 5-core interactions: user_id, parent_asin, rating, timestamp (ms since epoch)
+  ratings: benchmark/5core/rating_only/{category}.csv.gz
+  # Full product metadata for the category; filtered down to 5-core items
+  metadata: raw/meta_categories/meta_{category}.jsonl.gz
+
+paths:
+  raw_dir: data/raw
+  interim_dir: data/interim
+  processed_dir: data/processed
+  reports_dir: reports
+
+processing:
+  # Rows per batch when streaming CSV / JSONL into Parquet
+  chunk_size: 50000
+  # Drop interactions whose product has no title in the metadata file
+  require_title: true
+
+split:
+  # Global time cutoffs taken at these quantiles of the interaction timestamps:
+  # train: ts <= q(train_quantile), val: <= q(val_quantile), test: the rest
+  train_quantile: 0.8
+  val_quantile: 0.9

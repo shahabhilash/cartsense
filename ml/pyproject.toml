@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cartsense-ml"
+version = "0.1.0"
+description = "Data processing, training, evaluation and inference for the CartSense recommender"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.1,<3",
+    "pyarrow>=15",
+    "pyyaml>=6",
+    "requests>=2.31",
+    "truststore>=0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["cartsense_ml*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

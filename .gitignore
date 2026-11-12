@@ -218,3 +218,43 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---------------------------------------------------------------
+# CartSense project rules
+# ---------------------------------------------------------------
+# Datasets (raw, intermediate and processed) are never committed
+data/
+*.parquet
+*.csv.gz
+*.jsonl.gz
+
+# Model binaries and experiment tracking
+artifacts/
+mlruns/
+mlartifacts/
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.joblib
+*.pkl
+*.xgb
+
+# Secrets
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# The Python template ignores lib/, which would hide frontend source
+!apps/web/lib/
+!apps/web/src/lib/
