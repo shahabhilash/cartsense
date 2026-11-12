@@ -1,0 +1,13 @@
+{
+  "raw_interactions": 814586,
+  "dropped_missing_fields": 0,
+  "dropped_invalid_rating": 0,
+  "dropped_duplicate_pairs": 0,
+  "dropped_unknown_or_untitled_item": 53,
+  "interactions": 814533,
+  "raw_products": 25612,
+  "dropped_duplicate_products": 0,
+  "dropped_untitled_products": 1,
+  "dropped_products_without_interactions": 0,
+  "products": 25611
+}

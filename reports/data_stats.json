@@ -1,0 +1,109 @@
+{
+  "clean": {
+    "raw_interactions": 814586,
+    "dropped_missing_fields": 0,
+    "dropped_invalid_rating": 0,
+    "dropped_duplicate_pairs": 0,
+    "dropped_unknown_or_untitled_item": 53,
+    "interactions": 814533,
+    "raw_products": 25612,
+    "dropped_duplicate_products": 0,
+    "dropped_untitled_products": 1,
+    "dropped_products_without_interactions": 0,
+    "products": 25611
+  },
+  "stats": {
+    "interactions": 814533,
+    "users": 94762,
+    "items": 25611,
+    "density": 0.000336,
+    "time_range": {
+      "first": "1999-10-22T21:43:15+00:00",
+      "last": "2023-09-02T18:14:28.630000+00:00"
+    },
+    "interactions_per_user": {
+      "min": 4,
+      "median": 6.0,
+      "p90": 14.0,
+      "p99": 38.0,
+      "max": 473,
+      "mean": 8.596
+    },
+    "interactions_per_item": {
+      "min": 5,
+      "median": 12.0,
+      "p90": 64.0,
+      "p99": 340.9,
+      "max": 2955,
+      "mean": 31.804
+    },
+    "users_below_5_interactions": 16,
+    "items_below_5_interactions": 0,
+    "rating_distribution": {
+      "1": 52551,
+      "2": 36804,
+      "3": 70341,
+      "4": 134794,
+      "5": 520043
+    },
+    "interactions_per_year": {
+      "1999": 57,
+      "2000": 1362,
+      "2001": 3471,
+      "2002": 5185,
+      "2003": 5201,
+      "2004": 5548,
+      "2005": 6064,
+      "2006": 5274,
+      "2007": 7404,
+      "2008": 9896,
+      "2009": 12288,
+      "2010": 16222,
+      "2011": 22072,
+      "2012": 28438,
+      "2013": 59874,
+      "2014": 83800,
+      "2015": 98466,
+      "2016": 84465,
+      "2017": 72520,
+      "2018": 64107,
+      "2019": 64912,
+      "2020": 49914,
+      "2021": 44170,
+      "2022": 46452,
+      "2023": 17371
+    },
+    "metadata_coverage": {
+      "description": 0.7339,
+      "features": 0.871,
+      "brand": 0.9953,
+      "price": 0.6687,
+      "image_url": 1.0,
+      "date_first_available": 0.9577
+    },
+    "top_platforms": {
+      "Legacy Systems": 11708,
+      "PC": 6355,
+      "Nintendo Switch": 2268,
+      "PlayStation 4": 1824,
+      "Xbox One": 1446,
+      "PlayStation 5": 292,
+      "Mac": 155,
+      "PlayStation Digital Content": 143,
+      "Xbox Series X & S": 135,
+      "Game Genre of the Month": 84
+    },
+    "top_brands": {
+      "Nintendo": 1499,
+      "Electronic Arts": 943,
+      "Ubisoft": 627,
+      "ACTIVISION": 620,
+      "PlayStation": 578,
+      "Microsoft": 576,
+      "SEGA": 482,
+      "Sony": 476,
+      "Square Enix": 381,
+      "BANDAI NAMCO Entertainment": 364
+    }
+  }
+}

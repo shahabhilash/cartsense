@@ -1,0 +1,45 @@
+{
+  "cutoffs": {
+    "train_end_ms": 1575950951090,
+    "val_end_ms": 1625860952071,
+    "train_end": "2019-12-10T04:09:11.090000+00:00",
+    "val_end": "2021-07-09T20:02:32.071000+00:00"
+  },
+  "train": {
+    "rows": 651626,
+    "users": 86152,
+    "items": 20487,
+    "first": "1999-10-22T21:43:15+00:00",
+    "last": "2019-12-10T04:09:11.090000+00:00"
+  },
+  "val": {
+    "rows": 81453,
+    "users": 29862,
+    "items": 11479,
+    "first": "2019-12-10T04:11:50.033000+00:00",
+    "last": "2021-07-09T20:02:32.071000+00:00"
+  },
+  "test": {
+    "rows": 81454,
+    "users": 25013,
+    "items": 10995,
+    "first": "2021-07-09T20:11:25.873000+00:00",
+    "last": "2023-09-02T18:14:28.630000+00:00"
+  },
+  "val_vs_train": {
+    "users": 29862,
+    "warm_users": 24628,
+    "cold_users": 5234,
+    "rows_from_cold_users": 24009,
+    "rows_with_cold_items": 22161,
+    "cold_items": 2366
+  },
+  "test_vs_train_val": {
+    "users": 25013,
+    "warm_users": 21637,
+    "cold_users": 3376,
+    "rows_from_cold_users": 25367,
+    "rows_with_cold_items": 37640,
+    "cold_items": 2758
+  }
+}
