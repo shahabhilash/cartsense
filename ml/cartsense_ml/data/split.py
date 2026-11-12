@@ -47,7 +47,7 @@ class Cutoffs:
 
 
 def compute_cutoffs(timestamps: pd.Series, train_quantile: float, val_quantile: float) -> Cutoffs:
-    # method="lower" returns an observed timestamp, so a cutoff is a real event time
+    # interpolation="lower" returns an observed timestamp, so a cutoff is a real event time
     t1 = int(timestamps.quantile(train_quantile, interpolation="lower"))
     t2 = int(timestamps.quantile(val_quantile, interpolation="lower"))
     if t2 <= t1:
