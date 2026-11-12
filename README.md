@@ -6,7 +6,9 @@ built on real product metadata and real review interactions from the
 (Video Games, 5-core); the recommender powers "Recommended for you",
 "Similar products" and "Why this?" explanations.
 
-> Work in progress. Phases 1–3 (data pipeline, evaluation, baselines, content-based and collaborative filtering) are complete; see the roadmap below.
+> Work in progress. The ML side (Phases 1–4) is complete; the API and the storefront are next.
+
+**Headline result (test period, NDCG@10):** two-stage hybrid 0.0182 vs 0.0131 for the best single model (ALS), +39%. Full tables: [docs/evaluation.md](docs/evaluation.md).
 
 ## Repository layout
 
@@ -55,7 +57,7 @@ respective owners.
 - [x] P1 Data download, preprocessing, time-based split
 - [x] P2 Evaluation harness and popularity baselines
 - [x] P3 Content-based and collaborative filtering models
-- [ ] P4 Neural collaborative filtering and hybrid re-ranker
+- [x] P4 Neural collaborative filtering and hybrid re-ranker
 - [ ] P5 Backend API and database
 - [ ] P6 Storefront
 - [ ] P7 Evaluation and optimisation

@@ -174,3 +174,102 @@ uncommitted change at the time was an edit to `README.md` (dataset
 attribution); the model code is exactly commit `faec0f1`. The tuning runs in
 `reports/results/tuning_p3/` were produced on the same code before it was
 committed, and are marked dirty for the same reason.
+
+## Neural collaborative filtering and the hybrid ranker (Phase 4)
+
+| Model | What it does |
+|---|---|
+| `ncf_d32_e5_pop1` | NeuMF (GMF + MLP, PyTorch): 32-dim embeddings, MLP 64→32→16, 4 sampled negatives per positive, BCE loss, 5 epochs, plus the popularity prior (weight 1.0) |
+| `hybrid_c100` | Each of ALS+pop, item-kNN+pop, content+pop and recent popularity retrieves its top 100. The union (about 200 per user) is re-ranked by XGBoost LambdaMART (`rank:ndcg`) on 24 features |
+
+### How the hybrid is trained without leakage
+
+The ranker needs labels from *after* the data its candidate models saw, just
+as in production. Within the history of each stage:
+
+1. The last 11% of the history (by time) becomes a label window. This is
+   about the same size as the evaluation window.
+2. The candidate models are fitted on the history before that window, and
+   candidates and features are built for the users active in it.
+   Label = 1 if the user reviewed the candidate in the window.
+3. XGBoost is trained on those groups, with early stopping on 10% of the
+   users held out.
+4. The candidate models are refitted on the full history for inference.
+
+The val or test window is never used in any of these steps.
+
+**Features** (all computed from the history up to the cutoff):
+* **Per candidate model:** its score, the candidate's rank by that score, and
+  whether that model retrieved it; plus how many models retrieved it.
+* **Item:** review count, recent popularity, mean rating, days since first
+  review, days since release.
+* **User:** activity, days since last review, mean rating.
+* **User-item:** the user's share of history on the item's platform and on
+  its brand, and the highest text similarity to anything already in the
+  history (to catch near-duplicates).
+
+The metadata's `average_rating` and `rating_number` are 2023 snapshots, so
+they would leak the future and are not used.
+
+### Tuning (val only)
+
+See [`reports/tuning_p4_val.md`](../reports/tuning_p4_val.md).
+
+* **NCF overfits quickly.** Training loss keeps falling (0.386 after epoch 1,
+  0.030 after epoch 20), but val NDCG@10 peaks at 5 epochs (0.0179) and
+  drops at 20 (0.0167). A wider model (64 dims) and L2 weight decay (1e-5)
+  did not help (0.0173 and 0.0178). Without the popularity prior, NCF
+  reaches only 0.0106.
+* **Hybrid candidate depth:** 100 candidates per model beat 50 (0.0271 vs
+  0.0261). The label-window candidate recall rose from 0.139 to 0.198. Deeper
+  lists and NCF as a fifth candidate model were not evaluated, to keep
+  run time down. They are listed as future work.
+
+### Results (all users)
+
+| Model | NDCG@10 val | NDCG@10 test | Recall@10 test | MAP@10 test | Coverage@10 test |
+|---|---:|---:|---:|---:|---:|
+| **hybrid_c100** | **0.0271** | **0.0182** | **0.0287** | **0.0101** | 0.0874 |
+| als_pop | 0.0196 | 0.0131 | 0.0211 | 0.0066 | 0.0751 |
+| content_tfidf_pop | 0.0186 | 0.0123 | 0.0219 | 0.0056 | 0.1252 |
+| category_popular | 0.0157 | 0.0124 | 0.0186 | 0.0069 | 0.0085 |
+| recent_popular | 0.0177 | 0.0114 | 0.0207 | 0.0049 | 0.0008 |
+| ncf_d32_e5_pop1 | 0.0179 | 0.0111 | 0.0175 | 0.0055 | 0.0499 |
+
+### Observations
+
+* **The hybrid is the best model on every accuracy metric, on both stages.**
+  On test, NDCG@10 is +39% over the best single model, `als_pop` (0.0182 vs
+  0.0131), and +47% over the best Phase 2 baseline, `category_popular`
+  (0.0124). Recall@10 is +36% (0.0287 vs 0.0211). For warm users the test
+  NDCG@10 is 0.0186 vs 0.0127.
+* **NCF does not beat ALS.** On test it is below `als_pop` (0.0111 vs 0.0131)
+  and slightly below plain `recent_popular` (0.0114). With a median of 6
+  interactions per user, the extra capacity of the MLP mostly overfits; the
+  linear factorisation in ALS generalises better. This matches published
+  re-evaluations of NCF against well-tuned matrix factorisation. NCF is
+  therefore not used as a candidate model in the final hybrid.
+* **What the ranker relies on:** the features with the highest gain in the
+  test-stage ranker are item freshness (days since first review, days since
+  release), content rank and score, review count, popularity rank, the
+  number of models that retrieved the item, and the user's brand share. The
+  ranker learns *when* to trust the personal signal and when "new and
+  popular" matters more, which the fixed popularity weight of Phase 3 could
+  not do.
+* **Candidate recall is now the ceiling.** In the test-stage label window,
+  only 18.0% of the items users went on to review were among their roughly
+  200 candidates. Better retrieval would lift the hybrid more than a better
+  ranker would.
+* **Cold users** get recent popularity in every model, so their numbers are
+  identical across models (test NDCG@10 0.0157).
+* **Cost:** a hybrid fit (two rounds of candidate-model training, features
+  for about 24k users, XGBoost) takes about 6 minutes on val and about
+  13 minutes on test on a laptop CPU. This is an offline batch job; serving
+  reads precomputed results.
+
+### Reproducibility note
+
+All Phase 4 results record code revision `b95f729` (clean tree). The val
+files in `reports/results/val/` for `ncf_d32_e5_pop1` and `hybrid_c100` are
+copies of the tuning-run files, which have the same configuration and code.
+The test stage was run once, with `ml/configs/p4_models.yaml`.

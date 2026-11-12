@@ -1,0 +1,18 @@
+# Phase 4: final NCF and hybrid settings, chosen on val (reports/tuning_p4_val.md).
+# Labels match the tuning runs, so the val results in reports/results/val/ are
+# the tuning runs' files (same code revision, same configuration).
+# Run: python -m cartsense_ml.experiments.run --config ml/configs/p4_models.yaml --stage test
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - {name: ncf, label: ncf_d32_e5_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 5, popularity_weight: 1.0}}
+  - {name: hybrid, label: hybrid_c100, params: {n_candidates: 100}}

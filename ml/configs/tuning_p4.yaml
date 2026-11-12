@@ -1,0 +1,30 @@
+# Phase 4 search on val only.
+#   NCF: training length, width, and the effect of the popularity prior.
+#   Hybrid: candidate depth per generator, and adding NCF as a generator.
+# Run: python -m cartsense_ml.experiments.run --config ml/configs/tuning_p4.yaml --stage val [--only ...]
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+report_group: tuning_p4
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - {name: ncf, label: ncf_d32_e5_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 5, popularity_weight: 1.0}}
+  - {name: ncf, label: ncf_d32_e10_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 10, popularity_weight: 1.0}}
+  - {name: ncf, label: ncf_d32_e20_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 20, popularity_weight: 1.0}}
+  - {name: ncf, label: ncf_d64_e10_pop1, params: {dim: 64, layers: [128, 64, 32], epochs: 10, popularity_weight: 1.0}}
+  - {name: ncf, label: ncf_d32_e10, params: {dim: 32, layers: [64, 32, 16], epochs: 10}}
+
+  - {name: hybrid, label: hybrid_c50, params: {n_candidates: 50}}
+  - {name: hybrid, label: hybrid_c100, params: {n_candidates: 100}}
+
+  # NCF overfits (training loss keeps falling while val NDCG drops after 5 epochs): try L2 regularisation
+  - {name: ncf, label: ncf_d32_e5_wd1e-5_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 5, weight_decay: 1.0e-5, popularity_weight: 1.0}}
+  - {name: ncf, label: ncf_d32_e10_wd1e-5_pop1, params: {dim: 32, layers: [64, 32, 16], epochs: 10, weight_decay: 1.0e-5, popularity_weight: 1.0}}
+
