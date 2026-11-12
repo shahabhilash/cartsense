@@ -1,3 +1,5 @@
+from datetime import date
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -87,8 +89,10 @@ def test_random_is_reproducible_with_seed(ds):
 
 def test_random_seeds_differ_on_larger_catalogue():
     n = 200
-    products = pd.DataFrame({"item_id": [f"I{i:03d}" for i in range(n)], "categories": [[]] * n})
-    history = pd.DataFrame({"user_id": ["U"], "item_id": ["I000"], "rating": [5.0], "timestamp": [1]})
+    products = pd.DataFrame(
+        {"item_id": [f"I{i:03d}" for i in range(n)], "categories": [[]] * n, "date_first_available": [date(2000, 1, 1)] * n}
+    )
+    history = pd.DataFrame({"user_id": ["U"], "item_id": ["I000"], "rating": [5.0], "timestamp": [1_600_000_000_000]})
     big = build_dataset(history, products)
     a = RandomRecommender(seed=7).fit(big).recommend(np.array([-1]), k=10)
     c = RandomRecommender(seed=8).fit(big).recommend(np.array([-1]), k=10)
