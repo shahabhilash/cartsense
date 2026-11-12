@@ -1,0 +1,20 @@
+# Phase 2: popularity baselines.
+# Run: python -m cartsense_ml.experiments.run --config ml/configs/baselines.yaml --stage val
+
+data_config: ml/configs/data.yaml
+seed: 42
+k_values: [10, 20]
+batch_size: 2048
+
+mlflow:
+  tracking_uri: sqlite:///mlruns.db   # relative paths resolve against the repo root
+  artifact_dir: mlruns
+  experiment: cartsense-offline-eval
+
+models:
+  - name: random
+  - name: most_popular
+  - name: recent_popular
+    params: {half_life_days: 180}
+  - name: category_popular
+    params: {half_life_days: 180}
