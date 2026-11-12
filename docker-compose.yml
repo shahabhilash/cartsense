@@ -1,0 +1,46 @@
+# Local stack: PostgreSQL + API + storefront.
+#   1. Produce the ML export first (see README): artifacts/export/
+#   2. cp .env.example .env   and set a real CARTSENSE_JWT_SECRET
+#   3. docker compose up --build
+#   4. docker compose exec api python -m app.load_data --export-dir /data/export
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cartsense
+      POSTGRES_USER: cartsense
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cartsense-local}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cartsense"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./services/api
+    env_file: .env
+    environment:
+      CARTSENSE_DATABASE_URL: postgresql+psycopg://cartsense:${POSTGRES_PASSWORD:-cartsense-local}@db:5432/cartsense
+      CARTSENSE_EXPORT_DIR: /data/export
+      CARTSENSE_CORS_ORIGINS: http://localhost:3000
+    volumes:
+      - ./artifacts/export:/data/export:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
