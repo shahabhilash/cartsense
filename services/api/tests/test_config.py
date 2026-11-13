@@ -52,3 +52,10 @@ def test_startup_rejects_url_without_host(monkeypatch, caplog, url):
     with pytest.raises(RuntimeError, match="incomplete"):
         asyncio.run(main.connect_with_retry())
     assert "copy button" in caplog.text
+
+
+def test_cors_origins_tolerate_trailing_slashes_and_quotes():
+    from app.config import Settings
+
+    s = Settings(cors_origins=' "https://shop.vercel.app/" , http://localhost:3000/,, ')
+    assert s.cors_origin_list == ["https://shop.vercel.app", "http://localhost:3000"]

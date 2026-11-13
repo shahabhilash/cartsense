@@ -55,7 +55,10 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        # Browsers send the origin without a trailing slash or quotes, so a
+        # value pasted as "https://shop.example.com/" must still match
+        origins = (o.strip().strip("'\"").rstrip("/") for o in self.cors_origins.split(","))
+        return [o for o in origins if o]
 
 
 @lru_cache
