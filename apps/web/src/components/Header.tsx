@@ -109,7 +109,7 @@ export function Header() {
       <div className="border-b border-mist bg-white/85 backdrop-blur">
         <div className="container-page flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
           <Link to="/" className="flex items-center gap-2" aria-label="CartSense home">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-violet-500 text-white shadow-sm">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-accent text-white shadow-sm">
               <Sparkles size={16} />
             </span>
             <span className="font-display text-xl font-extrabold tracking-tight">
@@ -131,7 +131,7 @@ export function Header() {
             <Link to="/wishlist" className="relative rounded-full p-2 hover:bg-mist" aria-label="Wishlist">
               <Heart size={20} />
               {wishlist.items.length > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
                   {wishlist.items.length}
                 </span>
               )}
@@ -139,7 +139,7 @@ export function Header() {
             <button onClick={() => cart.setOpen(true)} className="relative rounded-full p-2 hover:bg-mist" aria-label="Open bag">
               <ShoppingBag size={20} />
               {cart.count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
                   {cart.count}
                 </span>
               )}

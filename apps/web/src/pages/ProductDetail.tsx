@@ -52,7 +52,7 @@ export default function ProductDetail() {
     window.scrollTo({ top: 0 });
   }, [id]);
 
-  if (error) return <p className="text-accent">{error}</p>;
+  if (error) return <p className="text-brand">{error}</p>;
   if (!product) return <DetailSkeleton />;
 
   const description = product.description ?? "";
@@ -89,7 +89,7 @@ export default function ProductDetail() {
                 {product.review_count.toLocaleString()} reviews
               </span>
               {product.popularity_rank && product.popularity_rank <= 500 && (
-                <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">
                   #{product.popularity_rank} trending
                 </span>
               )}
@@ -103,7 +103,7 @@ export default function ProductDetail() {
                 <ShoppingBag size={16} /> Add to bag
               </button>
               <button onClick={() => wishlist.toggle(product)} className="btn-outline py-3" aria-pressed={saved}>
-                <Heart size={16} className={saved ? "fill-accent text-accent" : ""} />
+                <Heart size={16} className={saved ? "fill-brand text-brand" : ""} />
                 {saved ? "Saved" : "Save"}
               </button>
             </div>

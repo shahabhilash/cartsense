@@ -31,7 +31,7 @@ export function CartLineRow({ line }: { line: CartLine }) {
           <span className="text-sm font-semibold">{formatPrice(product.price == null ? null : product.price * quantity)}</span>
         </div>
       </div>
-      <button onClick={() => cart.remove(product.id)} className="self-start p-1 text-ink-muted hover:text-accent" aria-label="Remove">
+      <button onClick={() => cart.remove(product.id)} className="self-start p-1 text-ink-muted hover:text-brand" aria-label="Remove">
         <Trash2 size={15} />
       </button>
     </li>

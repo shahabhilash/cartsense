@@ -64,7 +64,7 @@ export default function Login() {
           <input required type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)}
             placeholder="Password (8+ characters)" className="input" autoComplete={mode === "login" ? "current-password" : "new-password"} />
         </div>
-        {error && <p className="mt-3 text-sm text-accent" role="alert">{error}</p>}
+        {error && <p className="mt-3 text-sm text-brand" role="alert">{error}</p>}
         <button disabled={busy} className="btn-primary mt-6 w-full py-3">
           {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"} <ArrowRight size={16} />
         </button>

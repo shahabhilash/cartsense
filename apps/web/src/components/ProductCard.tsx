@@ -40,7 +40,7 @@ export function ProductCard({
           aria-pressed={saved}
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition hover:scale-110"
         >
-          <Heart size={15} className={saved ? "fill-accent text-accent" : ""} />
+          <Heart size={15} className={saved ? "fill-brand text-brand" : ""} />
         </button>
         <button
           onClick={() => cart.add(product)}

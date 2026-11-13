@@ -3,17 +3,17 @@ import type { Product } from "@/lib/api";
 // Product images are Amazon's and are off by default, so each product gets a
 // generated "box art" tile: a palette per platform and a monogram from the title.
 
-// Muted gradients per platform, on the same slate/indigo scale as the UI
+// Muted gradients per platform, in the same warm family as the UI
 const PALETTES: Record<string, [string, string, string]> = {
-  PC: ["#1E293B", "#334155", "#E2E8F0"],
-  "Nintendo Switch": ["#BE123C", "#E11D48", "#FFF1F2"],
-  "PlayStation 4": ["#1E3A8A", "#2563EB", "#EFF6FF"],
-  "PlayStation 5": ["#E2E8F0", "#F8FAFC", "#1E3A8A"],
-  "Xbox One": ["#065F46", "#059669", "#ECFDF5"],
-  "Xbox Series X & S": ["#14532D", "#16A34A", "#F0FDF4"],
-  "Legacy Systems": ["#4338CA", "#7C3AED", "#EEF2FF"],
+  PC: ["#292524", "#44403C", "#E8B98A"],
+  "Nintendo Switch": ["#5C1626", "#8E2A42", "#F9E6EA"],
+  "PlayStation 4": ["#1E2A44", "#33476B", "#F5F5F4"],
+  "PlayStation 5": ["#F5F5F4", "#FAFAF9", "#5C1626"],
+  "Xbox One": ["#22382C", "#3B5A45", "#F5F5F4"],
+  "Xbox Series X & S": ["#1F3326", "#365940", "#E8B98A"],
+  "Legacy Systems": ["#9A6330", "#C68642", "#FFF7ED"],
 };
-const DEFAULT_PALETTE: [string, string, string] = ["#475569", "#64748B", "#F8FAFC"];
+const DEFAULT_PALETTE: [string, string, string] = ["#57534E", "#78716C", "#FAFAF9"];
 
 const STOP_WORDS = new Set(["the", "a", "an", "of", "and", "for", "with", "edition", "standard"]);
 

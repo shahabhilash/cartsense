@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container-page grid gap-8 py-12 sm:grid-cols-3">
         <div>
           <p className="font-display text-2xl font-extrabold tracking-tight text-white">
-            Cart<span className="text-brand-light">Sense</span>
+            Cart<span className="text-accent-light">Sense</span>
           </p>
           <p className="mt-3 max-w-xs text-sm text-canvas/60">
             A video game store where every recommendation comes with a reason.
