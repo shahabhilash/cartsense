@@ -1,4 +1,4 @@
-import { Star, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductArt } from "@/components/ProductArt";
@@ -58,11 +58,7 @@ export default function Account() {
                 <div className="w-16 shrink-0"><ProductArt product={h.product} size="sm" /></div>
                 <div className="min-w-0">
                   <p className="line-clamp-2 text-sm font-medium">{h.product.title}</p>
-                  <p className="mt-1 flex items-center gap-0.5" aria-label={`${h.rating} out of 5 stars`}>
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <Star key={i} size={12} className={i < h.rating ? "fill-brand text-brand" : "text-mist-deep"} />
-                    ))}
-                  </p>
+                  <p className="mt-1 text-xs font-semibold text-brand">Rated {h.rating}/5</p>
                   <p className="mt-0.5 text-xs text-ink-muted">{new Date(h.occurred_at).toLocaleDateString()}</p>
                 </div>
               </Link>

@@ -1,4 +1,4 @@
-import { Activity, MousePointerClick, Sparkles, Target } from "lucide-react";
+import { Activity, Cpu, MousePointerClick, Target } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, type Analytics } from "@/lib/api";
@@ -72,7 +72,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi icon={<Sparkles size={15} />} label="Active model" value={data.active_model_version?.replace("hybrid-", "Hybrid ") ?? "None"} note="Serving personal recommendations" />
+        <Kpi icon={<Cpu size={15} />} label="Active model" value={data.active_model_version?.replace("hybrid-", "Hybrid ") ?? "None"} note="Serving personal recommendations" />
         <Kpi icon={<Target size={15} />} label="Impressions" value={impressions.toLocaleString()} note="Recommended products shown" />
         <Kpi icon={<MousePointerClick size={15} />} label="Click-through" value={impressions ? `${((clicks / impressions) * 100).toFixed(1)}%` : "–"} note={`${clicks} ${clicks === 1 ? "click" : "clicks"} on recommendations`} />
         <Kpi icon={<Activity size={15} />} label="Store events" value={totalEvents.toLocaleString()} note="Views, clicks, searches, saves" />

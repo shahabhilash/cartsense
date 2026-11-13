@@ -1,14 +1,14 @@
-import { Eye, Flame, Gamepad2, Layers, Sparkles, Star, Users } from "lucide-react";
+import { Eye, Flame, Gamepad2, Layers, ThumbsUp, UserCheck, Users } from "lucide-react";
 import type { Reason } from "@/lib/api";
 
-const STYLE: Record<string, { label: string; icon: typeof Star }> = {
+const STYLE: Record<string, { label: string; icon: typeof Users }> = {
   also_reviewed_with: { label: "Bought together", icon: Users },
-  similar_taste: { label: "Similar taste", icon: Sparkles },
+  similar_taste: { label: "Similar taste", icon: UserCheck },
   similar_content: { label: "Similar content", icon: Layers },
   similar_to_session: { label: "From your browsing", icon: Eye },
   popular_on_platform: { label: "Your platform", icon: Gamepad2 },
   trending: { label: "Trending", icon: Flame },
-  general: { label: "Picked for you", icon: Star },
+  general: { label: "Picked for you", icon: ThumbsUp },
 };
 
 export function reasonStyle(type: string) {

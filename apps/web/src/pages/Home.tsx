@@ -1,4 +1,4 @@
-import { ArrowRight, Gamepad2, Sparkles } from "lucide-react";
+import { ArrowRight, Gamepad2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
@@ -48,7 +48,7 @@ function Hero({ signedIn }: { signedIn: boolean }) {
             </Link>
             {!signedIn && (
               <Link to="/login" className="btn border border-canvas/30 text-canvas hover:border-canvas">
-                <Sparkles size={16} /> Try a demo shopper
+                Try a demo shopper
               </Link>
             )}
           </div>

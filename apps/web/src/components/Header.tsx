@@ -1,4 +1,4 @@
-import { BarChart3, Heart, LogOut, Search, ShoppingBag, Sparkles, User as UserIcon } from "lucide-react";
+import { BarChart3, Heart, LogOut, Search, ShoppingBag, User as UserIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { api, formatPrice, logEvent, type Product } from "@/lib/api";
@@ -108,11 +108,8 @@ export function Header() {
       </div>
       <div className="border-b border-mist bg-surface/85 backdrop-blur">
         <div className="container-page flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
-          <Link to="/" className="flex items-center gap-2" aria-label="CartSense home">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-accent text-white shadow-sm">
-              <Sparkles size={16} />
-            </span>
-            <span className="font-display text-xl font-extrabold tracking-tight">
+          <Link to="/" className="flex items-center" aria-label="CartSense home">
+            <span className="font-display text-2xl font-extrabold tracking-tight">
               Cart<span className="text-brand">Sense</span>
             </span>
           </Link>

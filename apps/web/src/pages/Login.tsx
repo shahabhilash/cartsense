@@ -1,4 +1,4 @@
-import { ArrowRight, Gamepad2, Sparkles } from "lucide-react";
+import { ArrowRight, Gamepad2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type DemoUser, type User } from "@/lib/api";
@@ -98,7 +98,6 @@ export default function Login() {
                   <span className="block truncate text-sm font-medium">{d.display_name.replace(/\s*\(.*\)$/, "")}</span>
                   <span className="block truncate text-xs text-canvas/50">{d.platform ?? "Mixed"} · {d.reviews} reviews</span>
                 </span>
-                <Sparkles size={15} className="text-brand-light opacity-0 transition group-hover:opacity-100" />
               </button>
             </li>
           ))}

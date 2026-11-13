@@ -1,4 +1,4 @@
-import { Heart, Plus, Sparkles } from "lucide-react";
+import { Heart, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatPrice, logEvent, type Product, type Reason } from "@/lib/api";
@@ -69,7 +69,7 @@ export function ProductCard({
               className="mt-2 inline-flex items-center gap-1 self-start text-xs font-medium text-brand-dark hover:underline"
               aria-expanded={open}
             >
-              <Sparkles size={12} /> {open ? "Hide" : "Why this?"}
+              {open ? "Hide" : "Why this?"}
             </button>
             {open && (
               <div className="mt-2 animate-fade-up">

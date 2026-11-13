@@ -1,4 +1,4 @@
-import { ChevronRight, Heart, ShieldCheck, ShoppingBag, Sparkles, Star } from "lucide-react";
+import { ChevronRight, Heart, Lightbulb, MessageSquare, ShieldCheck, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ProductArt } from "@/components/ProductArt";
@@ -85,7 +85,7 @@ export default function ProductDetail() {
             <h1 className="mt-2 text-3xl leading-tight sm:text-4xl">{product.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-ink-muted">
               <span className="inline-flex items-center gap-1">
-                <Star size={14} className="fill-brand text-brand" />
+                <MessageSquare size={14} className="text-brand" />
                 {product.review_count.toLocaleString()} reviews
               </span>
               {product.popularity_rank && product.popularity_rank <= 500 && (
@@ -114,7 +114,7 @@ export default function ProductDetail() {
             {reasons.length > 0 && (
               <div className="mt-8 rounded-2xl border border-brand/30 bg-surface p-4">
                 <p className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold">
-                  <Sparkles size={15} className="text-brand-dark" /> Why we recommended this
+                  <Lightbulb size={15} className="text-brand-dark" /> Why we recommended this
                 </p>
                 <ReasonList reasons={reasons} />
               </div>
