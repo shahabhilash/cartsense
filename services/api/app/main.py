@@ -22,7 +22,16 @@ STARTUP_DELAY_SECONDS = 3
 async def connect_with_retry() -> None:
     """Create tables, retrying while a freshly provisioned database starts up.
     If it still fails, log what to check (without the password) and stop."""
-    url = redact_database_url(get_settings().database_url)
+    raw = get_settings().database_url
+    url = redact_database_url(raw)
+    if raw.startswith("postgresql") and not raw.split("://", 1)[1].strip("/"):
+        # Without a host the driver silently tries a local Unix socket instead
+        log.error(
+            "CARTSENSE_DATABASE_URL is incomplete (%r): it has no user, password, host or database. "
+            "Paste the full URL with the database page's copy button; the URL shown on screen is masked.",
+            raw,
+        )
+        raise RuntimeError("database URL is incomplete")
     for attempt in range(1, STARTUP_ATTEMPTS + 1):
         try:
             init_db()

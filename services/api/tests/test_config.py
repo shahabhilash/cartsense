@@ -38,3 +38,17 @@ def test_startup_reports_unreachable_database(monkeypatch, caplog):
         asyncio.run(main.connect_with_retry())
     assert "could not translate host name" in caplog.text
     assert "External URL" in caplog.text
+
+
+@pytest.mark.parametrize("url", ["postgresql+psycopg://", "postgres://", "postgresql:///"])
+def test_startup_rejects_url_without_host(monkeypatch, caplog, url):
+    import asyncio
+
+    import app.main as main
+    from app.config import Settings
+
+    monkeypatch.setattr(main, "get_settings", lambda: Settings(database_url=url))
+    monkeypatch.setattr(main, "init_db", lambda: pytest.fail("must not try to connect"))
+    with pytest.raises(RuntimeError, match="incomplete"):
+        asyncio.run(main.connect_with_retry())
+    assert "copy button" in caplog.text
