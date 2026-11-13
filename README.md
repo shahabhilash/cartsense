@@ -1,12 +1,20 @@
 # CartSense
 
-**A video game store with a built-in, explainable recommendation engine.**
+**An explainable recommendation engine for online stores, with a working storefront built on top of it.**
 
-CartSense is a full-stack e-commerce application (React + FastAPI) whose
-recommendations come from a machine-learning pipeline trained on
-**814,533 real Amazon reviews**. Every recommendation answers "Why this?",
-and every one the store shows is logged, so each model version can be compared
-by real click-through.
+**The problem.** Large marketplaces have teams building personalised
+recommendations; small and mid-sized online stores usually show the same
+bestsellers to everyone. They also face three practical gaps: most of their
+visitors never sign in, recommendations are black boxes that shoppers don't
+trust, and there is no simple way to prove that recommendations actually help.
+
+**What CartSense does.** It learns from a store's catalogue and purchase
+history, personalises for signed-in **and anonymous** visitors, explains every
+suggestion ("Why this?"), retrains on the store's own live behaviour, and
+measures its impact with a built-in **A/B test** against a popularity
+baseline. It is demonstrated as a video game store (React + FastAPI) on
+**814,533 real Amazon reviews**, and exposes a REST API that other stores can
+call with an API key.
 
 ![CI](https://github.com/shahabhilash/cartsense/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue)
@@ -28,8 +36,17 @@ by real click-through.
 - **Explainable.** Each recommendation carries structured reasons, e.g.
   *"Similar to 'Metroid Fusion' (shared: samus, metroid prime)"* or
   *"People who reviewed X also reviewed this"*.
-- **Cold start handled.** Guests see what is trending; a new user gets
-  personal recommendations after viewing a single product.
+- **Personalises without a login.** Guests are recognised by their browsing
+  session: after viewing a single product they get related recommendations,
+  and that history carries over if they sign up.
+- **Learns from live behaviour.** One command (`scripts/retrain.py`) pulls
+  real store events (views, clicks, bag additions, wishlists; synthetic events
+  are always excluded), retrains the hybrid on dataset + store activity, and
+  activates the new model version. Store accounts then get model-based
+  recommendations that reflect what they did in the store.
+- **Proves its impact.** A built-in A/B test splits visitors (stable hashing
+  per visitor) between the model and a popularity control, and reports
+  click-through and add-to-bag rate per group with a two-proportion z-test.
 - **Production-style serving.** Batch-precomputed recommendations, a
   lightweight API with no ML runtime, impression and click logging, and CTR
   per model version on an analytics dashboard.
@@ -76,10 +93,12 @@ flowchart LR
     J[External store] -- API key --> H
 ```
 
-Recommendation strategies, in order: **precomputed** hybrid output for known
-users → **session similarity** for new users (similar products to what they
-viewed) → **popularity** for guests. Details and design tradeoffs:
-[docs/architecture.md](docs/architecture.md).
+Recommendation strategies, in order: **precomputed** hybrid output for
+shoppers the model was trained on → **session similarity** for new accounts
+and guests (products similar to what they viewed, clicked or saved) →
+**popularity** for visitors with no signal. When the A/B test is on, the
+control group always gets popularity. Store events feed back into the next
+retrain. Details and design tradeoffs: [docs/architecture.md](docs/architecture.md).
 
 ## Tech stack
 
@@ -120,10 +139,10 @@ Interactive documentation is served at `/docs`. Main endpoints (prefix `/api/v1`
 | GET | `/products?q=&platform=&sort=&page=` | Browse and search the catalogue |
 | GET | `/products/{id}` · `/products/{id}/similar` | Product details and similar products |
 | POST | `/auth/register` · `/auth/login` · `/auth/demo` | Accounts and demo personas (JWT) |
-| GET | `/recommendations?k=&surface=` | Personal recommendations with reasons and impression ids |
+| GET | `/recommendations?k=&surface=` | Recommendations with reasons and impression ids; guests send `X-Session-Id` |
 | POST | `/events` | Log views, clicks, searches, add-to-cart |
 | GET/POST/DELETE | `/me/wishlist` | Wishlist |
-| GET | `/analytics/overview` | Store activity, CTR per model version, offline metrics |
+| GET | `/analytics/overview` | Store activity, CTR per model version, A/B test results, offline metrics |
 | GET | `/partner/recommendations/{user_id}` | For external stores, authenticated with `X-API-Key` |
 
 Errors use one format: `{"error": {"code": 404, "message": "..."}}`.
@@ -131,8 +150,8 @@ Errors use one format: `{"error": {"code": 404, "message": "..."}}`.
 ## Testing
 
 ```bash
-cd ml && pytest                  # 93 tests: data pipeline, metrics, models, hybrid, experiments
-cd services/api && pytest        # 23 tests: endpoints, auth, cold start, CTR tracking, loader, config
+cd ml && pytest                  # 99 tests: data pipeline, metrics, models, hybrid, experiments, store feedback
+cd services/api && pytest        # 32 tests: endpoints, auth, guest sessions, A/B test, CTR tracking, loader, schema upgrade
 cd apps/web && npm test          # 9 tests: components, bag, wishlist, routing
 ```
 
@@ -167,14 +186,17 @@ CartSense uses the Amazon Reviews 2023 dataset from the McAuley Lab, UC San Dieg
 
 ## Known limitations and next steps
 
-- **Retraining from store events** is designed but not automated yet. Events
-  and impressions are logged, but no script merges them into the next
-  training run.
+- **No real store has used it yet.** The A/B test and the feedback retrain
+  work end to end, but the numbers they produce so far come from test
+  traffic, so there is no measured real-world sales lift to report.
+- **Retraining is run on demand** (`scripts/retrain.py`), not on a schedule,
+  and takes about 30–35 minutes on a laptop CPU.
 - **Model versions** are tracked in MLflow runs and in the database, but not
   registered in the MLflow Model Registry.
 - **Database:** the tests run on SQLite. PostgreSQL is supported through
   `DATABASE_URL` but has not been tested in CI. The schema is created on
-  startup; there are no migrations yet.
+  startup and new columns are added automatically; there is no full
+  migration tool yet.
 - **Docker:** the Docker setup has not been run end to end yet.
 - **Retrieval is the bottleneck:** only about 18% of the products users went
   on to review are among their candidates. Better retrieval would help more

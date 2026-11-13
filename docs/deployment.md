@@ -71,8 +71,44 @@ against the container's database instead (step 4.3 with the local URL).
 
 ## Retraining with store feedback
 
-Events written by the store are real behaviour (`is_synthetic = false`). The
-next retrain exports them from the `events` table and appends them to the
-interactions before `cartsense_ml.export` runs. Synthetic events, if ever
-generated for demos, must keep `is_synthetic = true` and are excluded from
-training and from every dashboard number.
+One command collects real store behaviour, retrains the hybrid on the dataset
+plus that behaviour, and activates the new model version:
+
+```powershell
+$env:CARTSENSE_DATABASE_URL = "<the store database URL>"
+.venv\Scripts\python scripts\retrain.py
+Remove-Item Env:CARTSENSE_DATABASE_URL
+```
+
+What it does:
+
+1. **Collect** (`cartsense_ml.feedback`): reads views, clicks, bag additions
+   and wishlists from the `events` table. Synthetic events
+   (`is_synthetic = true`) are never read. Each (shopper, product) pair
+   becomes one interaction with the strongest signal as its rating
+   (bag/wishlist 5, click 4, view 3). Demo shoppers are mapped back to their
+   dataset id, store accounts become `site:<id>`, and guest sessions with at
+   least two products become `session:<id>`.
+2. **Retrain** (`cartsense_ml.export --site-interactions`): store activity is
+   placed right after the dataset's last timestamp (in its original order),
+   so recency weighting treats it as the newest behaviour without letting a
+   few clicks outweigh the dataset. Recommendations are precomputed for demo
+   shoppers and for every store account with activity.
+3. **Load** (`app.load_data`): the new version becomes active. Earlier
+   versions stay in the database, so the dashboard compares click-through per
+   version.
+
+The run takes about 30–35 minutes on a laptop CPU. The URL is passed to each
+step through the environment only, so it never shows up in a command line or
+log. Use `--skip-load` to retrain without touching the database.
+
+## A/B testing
+
+Set `CARTSENSE_AB_CONTROL_SHARE` on the API (e.g. `0.5`) to send that share of
+visitors to a popularity control while the rest get the model. Assignment
+hashes the visitor (account, or browser session for guests) with the
+experiment name, so each visitor always sees the same variant. The dashboard's
+A/B section shows visitors, impressions, click-through and add-to-bag rate per
+variant, the click-through lift and two-proportion z-test p-values. Set it
+back to `0` to stop the test; `CARTSENSE_AB_EXPERIMENT` names the experiment
+(changing it reshuffles assignment).
