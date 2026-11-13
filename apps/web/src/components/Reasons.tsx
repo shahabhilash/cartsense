@@ -33,7 +33,7 @@ export function ReasonList({ reasons }: { reasons: Reason[] }) {
         const { label, icon: Icon } = reasonStyle(r.type);
         return (
           <li key={i} className="flex gap-2.5 rounded-xl bg-canvas-deep p-2.5 text-xs leading-relaxed text-ink-soft">
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-brand-dark shadow-sm">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface text-brand-dark shadow-sm">
               <Icon size={13} />
             </span>
             <span>

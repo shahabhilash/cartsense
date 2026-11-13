@@ -27,16 +27,16 @@ const STRATEGY: Record<RecList["strategy"], { eyebrow: string; title: string; su
 
 function Hero({ signedIn }: { signedIn: boolean }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] bg-ink text-canvas">
-      <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand/60 blur-3xl" />
-      <div className="absolute -bottom-32 left-1/4 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] bg-brand text-canvas">
+      <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/45 blur-3xl" />
+      <div className="absolute -bottom-32 left-1/4 h-80 w-80 rounded-full bg-brand-light/20 blur-3xl" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:22px_22px]" />
       <div className="relative grid gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.3fr_1fr] lg:items-center">
         <div>
           <p className="eyebrow text-brand-light">The explainable game store</p>
           <h1 className="mt-3 text-4xl leading-tight sm:text-5xl lg:text-6xl">
             Games chosen for you,<br />
-            <span className="bg-gradient-to-r from-brand-light via-accent-light to-accent-light bg-clip-text text-transparent">and the reason why.</span>
+            <span className="bg-gradient-to-r from-accent-light via-surface to-accent-light bg-clip-text text-transparent">and the reason why.</span>
           </h1>
           <p className="mt-5 max-w-lg text-canvas/70">
             25,000+ titles and accessories. Recommendations come from a model trained on 814,000 real reviews, and
@@ -132,7 +132,7 @@ export default function Home() {
               key={p.platform}
               to={`/products?platform=${encodeURIComponent(p.platform)}`}
               className={`group flex flex-col justify-between rounded-2xl border p-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand hover:shadow-lift ${
-                i === 0 ? "border-transparent bg-gradient-to-br from-brand to-accent-dark text-white" : "border-mist bg-white"
+                i === 0 ? "border-transparent bg-gradient-to-br from-brand to-accent-dark text-white" : "border-mist bg-surface"
               }`}
             >
               <Gamepad2 size={20} className={i === 0 ? "opacity-80" : "text-brand"} />

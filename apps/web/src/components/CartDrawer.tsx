@@ -50,7 +50,7 @@ export function CartDrawer() {
   if (!cart.open) return null;
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Your bag">
-      <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={() => cart.setOpen(false)} />
+      <div className="absolute inset-0 bg-brand/40 backdrop-blur-sm" onClick={() => cart.setOpen(false)} />
       <aside className="absolute right-0 top-0 flex h-full w-[min(100vw,420px)] animate-slide-in flex-col bg-canvas shadow-lift">
         <div className="flex items-center justify-between border-b border-mist px-5 py-4">
           <h2 className="text-xl">Your bag <span className="font-sans text-sm text-ink-muted">({cart.count})</span></h2>
@@ -69,7 +69,7 @@ export function CartDrawer() {
             <ul className="flex-1 divide-y divide-mist overflow-y-auto px-5">
               {cart.lines.map((l) => <CartLineRow key={l.product.id} line={l} />)}
             </ul>
-            <div className="border-t border-mist bg-white px-5 py-4">
+            <div className="border-t border-mist bg-surface px-5 py-4">
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
                 <span className="font-semibold">{formatPrice(cart.subtotal)}</span>

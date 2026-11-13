@@ -59,7 +59,7 @@ export default function Products() {
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
           <button
             onClick={() => go({ platform: "", page: "1" })}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${!platform ? "border-ink bg-ink text-canvas" : "border-mist-deep bg-white hover:border-ink"}`}
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${!platform ? "border-brand bg-brand text-canvas" : "border-mist-deep bg-surface hover:border-ink"}`}
           >
             All
           </button>
@@ -67,7 +67,7 @@ export default function Products() {
             <button
               key={p.platform}
               onClick={() => go({ platform: p.platform, page: "1" })}
-              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${platform === p.platform ? "border-ink bg-ink text-canvas" : "border-mist-deep bg-white hover:border-ink"}`}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${platform === p.platform ? "border-brand bg-brand text-canvas" : "border-mist-deep bg-surface hover:border-ink"}`}
             >
               {p.platform}
             </button>
@@ -80,7 +80,7 @@ export default function Products() {
             </button>
           )}
           <select value={sort} onChange={(e) => go({ sort: e.target.value, page: "1" })} aria-label="Sort"
-            className="rounded-full border border-mist-deep bg-white px-4 py-2 text-sm focus:border-brand focus:outline-none">
+            className="rounded-full border border-mist-deep bg-surface px-4 py-2 text-sm focus:border-brand focus:outline-none">
             {SORTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </div>

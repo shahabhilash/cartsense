@@ -53,7 +53,7 @@ export default function Login() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
-      <form onSubmit={submit} className="rounded-3xl bg-white p-8 shadow-card">
+      <form onSubmit={submit} className="rounded-3xl bg-surface p-8 shadow-card">
         <p className="eyebrow">{mode === "login" ? "Welcome back" : "Join CartSense"}</p>
         <h1 className="mt-1 text-3xl">{mode === "login" ? "Sign in" : "Create an account"}</h1>
         <div className="mt-6 space-y-3">
@@ -77,7 +77,7 @@ export default function Login() {
         </p>
       </form>
 
-      <div className="rounded-3xl bg-ink p-8 text-canvas">
+      <div className="rounded-3xl bg-brand p-8 text-canvas">
         <p className="eyebrow text-brand-light">No account needed</p>
         <h2 className="mt-1 text-3xl">Shop as a real customer</h2>
         <p className="mt-2 text-sm text-canvas/60">
@@ -90,8 +90,8 @@ export default function Login() {
           {demo?.map((d) => (
             <li key={d.dataset_user_id}>
               <button onClick={() => demoLogin(d.dataset_user_id)}
-                className="group flex w-full items-center gap-3 rounded-2xl border border-canvas/10 bg-canvas/5 p-3 text-left transition hover:border-brand hover:bg-canvas/10">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-white">
+                className="group flex w-full items-center gap-3 rounded-2xl border border-canvas/10 bg-canvas/5 p-3 text-left transition hover:border-accent-light hover:bg-canvas/10">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-white">
                   <Gamepad2 size={18} />
                 </span>
                 <span className="min-w-0 flex-1">

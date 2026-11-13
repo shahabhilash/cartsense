@@ -47,11 +47,11 @@ export function Rail({ children, loading = false }: { children: ReactNode; loadi
           : children}
       </div>
       <button onClick={() => scroll(-1)} aria-label="Scroll left"
-        className="absolute -left-3 top-[38%] hidden h-10 w-10 items-center justify-center rounded-full bg-white shadow-lift hover:bg-canvas lg:flex">
+        className="absolute -left-3 top-[38%] hidden h-10 w-10 items-center justify-center rounded-full bg-surface shadow-lift hover:bg-canvas lg:flex">
         <ChevronLeft size={18} />
       </button>
       <button onClick={() => scroll(1)} aria-label="Scroll right"
-        className="absolute -right-3 top-[38%] hidden h-10 w-10 items-center justify-center rounded-full bg-white shadow-lift hover:bg-canvas lg:flex">
+        className="absolute -right-3 top-[38%] hidden h-10 w-10 items-center justify-center rounded-full bg-surface shadow-lift hover:bg-canvas lg:flex">
         <ChevronRight size={18} />
       </button>
     </div>
@@ -64,7 +64,7 @@ export function RailItem({ children }: { children: ReactNode }) {
 
 export function EmptyState({ icon, title, children }: { icon: ReactNode; title: string; children?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-3xl border border-dashed border-mist-deep bg-white/60 px-6 py-14 text-center">
+    <div className="flex flex-col items-center rounded-3xl border border-dashed border-mist-deep bg-surface/60 px-6 py-14 text-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-mist text-brand-dark">{icon}</div>
       <h3 className="mt-4 text-xl">{title}</h3>
       {children && <div className="mt-2 max-w-md text-sm text-ink-muted">{children}</div>}

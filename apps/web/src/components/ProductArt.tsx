@@ -8,7 +8,7 @@ const PALETTES: Record<string, [string, string, string]> = {
   PC: ["#292524", "#44403C", "#E8B98A"],
   "Nintendo Switch": ["#5C1626", "#8E2A42", "#F9E6EA"],
   "PlayStation 4": ["#1E2A44", "#33476B", "#F5F5F4"],
-  "PlayStation 5": ["#F5F5F4", "#FAFAF9", "#5C1626"],
+  "PlayStation 5": ["#F4DEC1", "#FBEEDD", "#8A1538"],
   "Xbox One": ["#22382C", "#3B5A45", "#F5F5F4"],
   "Xbox Series X & S": ["#1F3326", "#365940", "#E8B98A"],
   "Legacy Systems": ["#9A6330", "#C68642", "#FFF7ED"],
@@ -28,7 +28,7 @@ export function monogram(title: string): string {
 export function ProductArt({ product, size = "md" }: { product: Product; size?: "sm" | "md" | "lg" }) {
   if (product.image_url) {
     return (
-      <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white">
+      <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-surface">
         <img src={product.image_url} alt="" className="h-full w-full object-contain p-4" loading="lazy" />
       </div>
     );

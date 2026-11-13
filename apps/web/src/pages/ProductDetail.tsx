@@ -75,7 +75,7 @@ export default function ProductDetail() {
 
         <div className="grid gap-10 lg:grid-cols-2">
           <div className="lg:sticky lg:top-36 lg:self-start">
-            <div className="rounded-3xl bg-white p-4 shadow-card">
+            <div className="rounded-3xl bg-surface p-4 shadow-card">
               <ProductArt product={product} size="lg" />
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function ProductDetail() {
             </p>
 
             {reasons.length > 0 && (
-              <div className="mt-8 rounded-2xl border border-brand/30 bg-white p-4">
+              <div className="mt-8 rounded-2xl border border-brand/30 bg-surface p-4">
                 <p className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold">
                   <Sparkles size={15} className="text-brand-dark" /> Why we recommended this
                 </p>

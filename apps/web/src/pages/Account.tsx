@@ -28,8 +28,8 @@ export default function Account() {
 
   return (
     <div className="space-y-10">
-      <div className="flex flex-wrap items-center gap-5 rounded-3xl bg-white p-6 shadow-card">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink font-display text-2xl text-canvas">
+      <div className="flex flex-wrap items-center gap-5 rounded-3xl bg-surface p-6 shadow-card">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand font-display text-2xl text-canvas">
           {user.display_name.slice(0, 1).toUpperCase()}
         </span>
         <div>
@@ -54,7 +54,7 @@ export default function Account() {
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {history?.map((h) => (
             <li key={h.product.id + h.occurred_at}>
-              <Link to={`/products/${h.product.id}`} className="flex gap-3 rounded-2xl bg-white p-3 shadow-card transition hover:shadow-lift">
+              <Link to={`/products/${h.product.id}`} className="flex gap-3 rounded-2xl bg-surface p-3 shadow-card transition hover:shadow-lift">
                 <div className="w-16 shrink-0"><ProductArt product={h.product} size="sm" /></div>
                 <div className="min-w-0">
                   <p className="line-clamp-2 text-sm font-medium">{h.product.title}</p>

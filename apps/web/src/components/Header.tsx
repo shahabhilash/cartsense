@@ -61,7 +61,7 @@ function SearchBox() {
         className="input pl-10"
       />
       {open && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 animate-fade-up overflow-hidden rounded-2xl bg-white shadow-lift">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 animate-fade-up overflow-hidden rounded-2xl bg-surface shadow-lift">
           {suggestions.map((p) => (
             <Link
               key={p.id}
@@ -103,10 +103,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-ink py-2 text-center text-xs text-canvas/80">
+      <div className="bg-brand-dark py-2 text-center text-xs text-accent-light">
         Every recommendation is explained. Tap <span className="font-semibold text-white">“Why this?”</span> on any pick.
       </div>
-      <div className="border-b border-mist bg-white/85 backdrop-blur">
+      <div className="border-b border-mist bg-surface/85 backdrop-blur">
         <div className="container-page flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
           <Link to="/" className="flex items-center gap-2" aria-label="CartSense home">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-accent text-white shadow-sm">
@@ -148,7 +148,7 @@ export function Header() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="ml-1 flex items-center gap-2 rounded-full border border-mist-deep bg-white py-1 pl-1 pr-3 text-sm hover:border-brand"
+                  className="ml-1 flex items-center gap-2 rounded-full border border-mist-deep bg-surface py-1 pl-1 pr-3 text-sm hover:border-brand"
                   aria-expanded={menuOpen}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand font-display text-xs font-bold text-white">
@@ -157,7 +157,7 @@ export function Header() {
                   <span className="hidden max-w-[140px] truncate sm:inline">{user.display_name}</span>
                 </button>
                 {menuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 animate-fade-up overflow-hidden rounded-2xl bg-white py-1 shadow-lift"
+                  <div className="absolute right-0 top-full mt-2 w-52 animate-fade-up overflow-hidden rounded-2xl bg-surface py-1 shadow-lift"
                     onMouseLeave={() => setMenuOpen(false)}>
                     <Link to="/account" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-canvas">
                       <UserIcon size={15} /> Your account

@@ -25,16 +25,16 @@
       disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-ink text-canvas hover:bg-ink-soft;
+    @apply btn bg-brand text-white hover:bg-brand-dark;
   }
   .btn-brand {
     @apply btn bg-brand text-white hover:bg-brand-dark;
   }
   .btn-outline {
-    @apply btn border border-ink/20 bg-white text-ink hover:border-ink;
+    @apply btn border border-ink/20 bg-surface text-ink hover:border-ink;
   }
   .input {
-    @apply w-full rounded-full border border-mist-deep bg-white px-4 py-2.5 text-sm placeholder:text-ink-muted
+    @apply w-full rounded-full border border-mist-deep bg-surface px-4 py-2.5 text-sm placeholder:text-ink-muted
       focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30;
   }
   .eyebrow {

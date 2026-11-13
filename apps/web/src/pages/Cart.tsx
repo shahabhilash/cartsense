@@ -24,10 +24,10 @@ export default function Cart() {
       <p className="eyebrow">Checkout</p>
       <h1 className="mt-1 text-4xl">Your bag</h1>
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <ul className="divide-y divide-mist rounded-3xl bg-white px-6 shadow-card">
+        <ul className="divide-y divide-mist rounded-3xl bg-surface px-6 shadow-card">
           {cart.lines.map((l) => <CartLineRow key={l.product.id} line={l} />)}
         </ul>
-        <aside className="h-fit rounded-3xl bg-white p-6 shadow-card lg:sticky lg:top-36">
+        <aside className="h-fit rounded-3xl bg-surface p-6 shadow-card lg:sticky lg:top-36">
           <h2 className="text-xl">Order summary</h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between"><dt>Items</dt><dd>{cart.count}</dd></div>
