@@ -1,6 +1,10 @@
 import { lazy, Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
+import { CartDrawer } from "@/components/CartDrawer";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import Account from "@/pages/Account";
+import Cart from "@/pages/Cart";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import ProductDetail from "@/pages/ProductDetail";
@@ -12,31 +16,40 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 
 function NotFound() {
   return (
-    <p>
-      Page not found. <Link to="/" className="text-indigo-700 underline">Back to the store</Link>
-    </p>
+    <div className="py-20 text-center">
+      <p className="eyebrow">Error 404</p>
+      <h1 className="mt-2 text-4xl">Page not found</h1>
+      <Link to="/" className="btn-primary mt-6">Back to the store</Link>
+    </div>
   );
 }
 
 export default function App() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="container-page flex-1 py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/account" element={<Account />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Suspense fallback={<p>Loading…</p>}><Dashboard /></Suspense>} />
+          <Route
+            path="/dashboard"
+            element={
+              <Suspense fallback={<div className="h-32 animate-pulse rounded-3xl bg-sand" />}>
+                <Dashboard />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <footer className="mx-auto max-w-6xl px-4 py-8 text-xs text-gray-500">
-        Product data from the Amazon Reviews 2023 dataset (McAuley Lab, UCSD), used for non-commercial demonstration.
-        Product names and brands belong to their owners.
-      </footer>
-    </>
+      <Footer />
+      <CartDrawer />
+    </div>
   );
 }

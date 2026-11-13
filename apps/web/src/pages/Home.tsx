@@ -1,55 +1,160 @@
-import { Link } from "react-router-dom";
+import { ArrowRight, Gamepad2, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
-import { api, getToken, type RecList } from "@/lib/api";
+import { Rail, RailItem, Section } from "@/components/Rail";
+import { api, type Product, type RecList } from "@/lib/api";
+import { useAuth } from "@/state/auth";
+import { recentlyViewed } from "@/state/recent";
 
-const STRATEGY_LABEL: Record<RecList["strategy"], string> = {
-  precomputed: "Recommended for you",
-  session_similarity: "Based on what you browsed",
-  popular: "Trending now",
+const STRATEGY: Record<RecList["strategy"], { eyebrow: string; title: string; subtitle: string }> = {
+  precomputed: {
+    eyebrow: "Curated for you",
+    title: "Recommended for you",
+    subtitle: "Ranked by our hybrid model from your review history. Tap “Why this?” on any pick.",
+  },
+  session_similarity: {
+    eyebrow: "Based on your browsing",
+    title: "Picked from what you viewed",
+    subtitle: "Products similar to the ones you looked at in this store.",
+  },
+  popular: {
+    eyebrow: "Right now",
+    title: "Trending in the store",
+    subtitle: "What shoppers are reviewing most at the moment.",
+  },
 };
 
+function Hero({ signedIn }: { signedIn: boolean }) {
+  return (
+    <section className="relative overflow-hidden rounded-[2rem] bg-ink text-ivory">
+      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-camel/30 blur-3xl" />
+      <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-oxblood/30 blur-3xl" />
+      <div className="relative grid gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+        <div>
+          <p className="eyebrow text-camel-light">The explainable game store</p>
+          <h1 className="mt-3 text-4xl leading-tight sm:text-5xl lg:text-6xl">
+            Games chosen for you,<br />
+            <span className="italic text-camel-light">and the reason why.</span>
+          </h1>
+          <p className="mt-5 max-w-lg text-ivory/70">
+            25,000+ titles and accessories. Recommendations come from a model trained on 814,000 real reviews, and
+            every one tells you what it was based on.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/products" className="btn bg-ivory text-ink hover:bg-sand">
+              Shop the collection <ArrowRight size={16} />
+            </Link>
+            {!signedIn && (
+              <Link to="/login" className="btn border border-ivory/30 text-ivory hover:border-ivory">
+                <Sparkles size={16} /> Try a demo shopper
+              </Link>
+            )}
+          </div>
+        </div>
+        <dl className="grid grid-cols-3 gap-3 text-center lg:grid-cols-1 lg:text-left">
+          {[
+            ["+39%", "ranking quality vs. the best single model"],
+            ["4", "models combined by a learned ranker"],
+            ["100%", "of recommendations explained"],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl border border-ivory/10 bg-ivory/5 p-4">
+              <dt className="font-serif text-3xl text-camel-light">{value}</dt>
+              <dd className="mt-1 text-xs text-ivory/60">{label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
+  const { user } = useAuth();
   const [recs, setRecs] = useState<RecList | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [trending, setTrending] = useState<Product[] | null>(null);
   const [platforms, setPlatforms] = useState<{ platform: string; products: number }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const recent = recentlyViewed();
 
   useEffect(() => {
+    setRecs(null);
     api<RecList>("/recommendations?k=12&surface=home").then(setRecs).catch((e) => setError(e.message));
+  }, [user]);
+
+  useEffect(() => {
+    api<{ items: Product[] }>("/products?sort=popular&page_size=12").then((r) => setTrending(r.items)).catch(() => {});
     api<{ platform: string; products: number }[]>("/platforms").then(setPlatforms).catch(() => {});
   }, []);
 
+  const meta = STRATEGY[recs?.strategy ?? "popular"];
+
   return (
-    <div className="space-y-8">
-      <section>
-        <div className="flex items-baseline justify-between">
-          <h1 className="text-xl font-semibold">{recs ? STRATEGY_LABEL[recs.strategy] : "Loading…"}</h1>
-          {recs && <span className="text-xs text-gray-500">model: {recs.model_version}</span>}
-        </div>
-        {!getToken() && (
-          <p className="mt-1 text-sm text-gray-600">
-            <Link to="/login" className="text-indigo-700 underline">Sign in or try a demo shopper</Link> to see
-            personal recommendations.
-          </p>
+    <div className="space-y-16">
+      <Hero signedIn={!!user} />
+
+      <Section
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        subtitle={meta.subtitle}
+        action={recs && <span className="rounded-full bg-sand px-3 py-1 text-[11px] text-ink-soft">model · {recs.model_version}</span>}
+      >
+        {error ? (
+          <p className="text-sm text-oxblood">Could not load recommendations: {error}</p>
+        ) : (
+          <Rail loading={!recs}>
+            {recs?.items.map((r) => (
+              <RailItem key={r.product.id}>
+                <ProductCard product={r.product} reasons={r.reasons} impressionId={r.impression_id} />
+              </RailItem>
+            ))}
+          </Rail>
         )}
-        {error && <p className="mt-3 text-sm text-red-600">Could not load recommendations: {error}</p>}
-        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {recs?.items.map((r) => (
-            <ProductCard key={r.product.id} product={r.product} reasons={r.reasons} impressionId={r.impression_id} />
-          ))}
-        </div>
-      </section>
-      <section>
-        <h2 className="text-lg font-semibold">Shop by platform</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {platforms.map((p) => (
-            <Link key={p.platform} to={`/products?platform=${encodeURIComponent(p.platform)}`}
-              className="rounded-full border bg-white px-3 py-1 text-sm hover:bg-gray-50">
-              {p.platform} <span className="text-gray-400">({p.products})</span>
+      </Section>
+
+      {recent.length > 0 && (
+        <Section eyebrow="Pick up where you left off" title="Recently viewed">
+          <Rail>
+            {recent.map((p) => (
+              <RailItem key={p.id}>
+                <ProductCard product={p} />
+              </RailItem>
+            ))}
+          </Rail>
+        </Section>
+      )}
+
+      <Section eyebrow="Browse by system" title="Shop by platform">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {platforms.slice(0, 10).map((p, i) => (
+            <Link
+              key={p.platform}
+              to={`/products?platform=${encodeURIComponent(p.platform)}`}
+              className={`group flex flex-col justify-between rounded-2xl p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-lift ${
+                i % 3 === 0 ? "bg-camel text-white" : i % 3 === 1 ? "bg-white" : "bg-sand"
+              }`}
+            >
+              <Gamepad2 size={20} className="opacity-70" />
+              <div className="mt-6">
+                <p className="font-serif text-lg leading-tight">{p.platform}</p>
+                <p className="mt-1 text-xs opacity-70">{p.products.toLocaleString()} products</p>
+              </div>
             </Link>
           ))}
         </div>
-      </section>
+      </Section>
+
+      {user && (
+        <Section eyebrow="Everyone is playing" title="Bestsellers" action={<Link to="/products" className="text-sm font-medium text-camel-dark hover:underline">View all</Link>}>
+          <Rail loading={!trending}>
+            {trending?.map((p) => (
+              <RailItem key={p.id}>
+                <ProductCard product={p} />
+              </RailItem>
+            ))}
+          </Rail>
+        </Section>
+      )}
     </div>
   );
 }

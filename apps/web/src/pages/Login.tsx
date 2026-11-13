@@ -1,33 +1,45 @@
+import { ArrowRight, Gamepad2, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { api, setToken, type DemoUser, type User } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
+import { api, type DemoUser, type User } from "@/lib/api";
+import { useAuth } from "@/state/auth";
+import { useToast } from "@/state/toast";
 
 type Token = { access_token: string; user: User };
 
 export default function Login() {
+  const { signIn } = useAuth();
+  const { notify } = useToast();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [demo, setDemo] = useState<DemoUser[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [demo, setDemo] = useState<DemoUser[] | null>(null);
 
   useEffect(() => {
-    api<DemoUser[]>("/auth/demo-users?limit=12").then(setDemo).catch(() => {});
+    api<DemoUser[]>("/auth/demo-users?limit=12").then(setDemo).catch(() => setDemo([]));
   }, []);
 
   function done(t: Token) {
-    setToken(t.access_token);
-    window.location.href = "/";
+    signIn(t.access_token, t.user);
+    notify(`Welcome, ${t.user.display_name}`);
+    navigate("/");
   }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setBusy(true);
     try {
       const body = mode === "login" ? { email, password } : { email, password, display_name: name };
       done(await api<Token>(`/auth/${mode}`, { method: "POST", body: JSON.stringify(body) }));
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -40,60 +52,53 @@ export default function Login() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <form onSubmit={submit} className="space-y-3 rounded-lg border bg-white p-5">
-        <h1 className="text-lg font-semibold">{mode === "login" ? "Sign in" : "Create an account"}</h1>
-        {mode === "register" && (
-          <input
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Display name"
-            className="w-full rounded border px-3 py-2 text-sm"
-          />
-        )}
-        <input
-          required
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full rounded border px-3 py-2 text-sm"
-        />
-        <input
-          required
-          type="password"
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password (8+ characters)"
-          className="w-full rounded border px-3 py-2 text-sm"
-        />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button className="w-full rounded bg-indigo-600 py-2 text-sm text-white">
-          {mode === "login" ? "Sign in" : "Register"}
+    <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+      <form onSubmit={submit} className="rounded-3xl bg-white p-8 shadow-card">
+        <p className="eyebrow">{mode === "login" ? "Welcome back" : "Join CartSense"}</p>
+        <h1 className="mt-1 text-3xl">{mode === "login" ? "Sign in" : "Create an account"}</h1>
+        <div className="mt-6 space-y-3">
+          {mode === "register" && (
+            <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Display name" className="input" />
+          )}
+          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="input" autoComplete="email" />
+          <input required type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password (8+ characters)" className="input" autoComplete={mode === "login" ? "current-password" : "new-password"} />
+        </div>
+        {error && <p className="mt-3 text-sm text-oxblood" role="alert">{error}</p>}
+        <button disabled={busy} className="btn-primary mt-6 w-full py-3">
+          {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"} <ArrowRight size={16} />
         </button>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "login" ? "register" : "login")}
-          className="text-xs text-indigo-700"
-        >
-          {mode === "login" ? "New here? Create an account" : "Have an account? Sign in"}
+        <button type="button" onClick={() => setMode(mode === "login" ? "register" : "login")}
+          className="mt-4 w-full text-center text-sm text-ink-muted hover:text-ink">
+          {mode === "login" ? "New here? Create an account" : "Already a member? Sign in"}
         </button>
-      </form>
-      <div className="rounded-lg border bg-white p-5">
-        <h2 className="text-lg font-semibold">Try a demo shopper</h2>
-        <p className="mt-1 text-sm text-gray-600">
-          Real (anonymised) shoppers from the dataset. Their recommendations come from the trained hybrid model.
+        <p className="mt-6 rounded-2xl bg-ivory-deep p-3 text-xs leading-relaxed text-ink-muted">
+          New accounts start with trending picks. Browse a few products and your recommendations adapt straight away.
         </p>
-        <ul className="mt-3 space-y-2">
-          {demo.map((d) => (
+      </form>
+
+      <div className="rounded-3xl bg-ink p-8 text-ivory">
+        <p className="eyebrow text-camel-light">No account needed</p>
+        <h2 className="mt-1 text-3xl">Shop as a real customer</h2>
+        <p className="mt-2 text-sm text-ivory/60">
+          These are anonymised shoppers from the dataset. Pick one to see the recommendations our hybrid model built
+          from their review history.
+        </p>
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {demo === null &&
+            Array.from({ length: 6 }, (_, i) => <li key={i} className="h-16 animate-pulse rounded-2xl bg-ivory/10" />)}
+          {demo?.map((d) => (
             <li key={d.dataset_user_id}>
-              <button
-                onClick={() => demoLogin(d.dataset_user_id)}
-                className="w-full rounded border px-3 py-2 text-left text-sm hover:bg-gray-50"
-              >
-                {d.display_name} <span className="text-gray-500">· {d.reviews} reviews</span>
+              <button onClick={() => demoLogin(d.dataset_user_id)}
+                className="group flex w-full items-center gap-3 rounded-2xl border border-ivory/10 bg-ivory/5 p-3 text-left transition hover:border-camel hover:bg-ivory/10">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-camel text-white">
+                  <Gamepad2 size={18} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium">{d.display_name.replace(/\s*\(.*\)$/, "")}</span>
+                  <span className="block truncate text-xs text-ivory/50">{d.platform ?? "Mixed"} · {d.reviews} reviews</span>
+                </span>
+                <Sparkles size={15} className="text-camel-light opacity-0 transition group-hover:opacity-100" />
               </button>
             </li>
           ))}

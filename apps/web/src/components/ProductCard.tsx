@@ -1,41 +1,13 @@
-import { Link } from "react-router-dom";
+import { Heart, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { formatPrice, logEvent, type Product, type Reason } from "@/lib/api";
+import { useCart } from "@/state/cart";
+import { useWishlist } from "@/state/wishlist";
+import { ProductArt } from "./ProductArt";
+import { ReasonChip, ReasonList } from "./Reasons";
 
-const PLATFORM_COLOURS: Record<string, string> = {
-  PC: "bg-slate-700",
-  "Nintendo Switch": "bg-red-600",
-  "PlayStation 4": "bg-blue-700",
-  "PlayStation 5": "bg-blue-500",
-  "Xbox One": "bg-green-700",
-  "Xbox Series X & S": "bg-green-600",
-  "Legacy Systems": "bg-amber-700",
-};
-
-export function ProductThumb({ product }: { product: Product }) {
-  if (product.image_url) {
-    return <img src={product.image_url} alt="" className="h-32 w-full rounded object-contain bg-white" />;
-  }
-  const colour = PLATFORM_COLOURS[product.platform ?? ""] ?? "bg-gray-500";
-  return (
-    <div className={`flex h-32 w-full items-center justify-center rounded ${colour} px-2 text-center text-xs font-semibold text-white`}>
-      {product.platform ?? "Video Games"}
-    </div>
-  );
-}
-
-export function ReasonList({ reasons }: { reasons: Reason[] }) {
-  if (!reasons.length) return null;
-  return (
-    <ul className="mt-2 space-y-1 text-xs text-gray-600" aria-label="Why this was recommended">
-      {reasons.map((r, i) => (
-        <li key={i} className="rounded bg-gray-100 px-2 py-1">
-          {r.text}
-        </li>
-      ))}
-    </ul>
-  );
-}
+export { ReasonList } from "./Reasons";
 
 export function ProductCard({
   product,
@@ -47,26 +19,79 @@ export function ProductCard({
   impressionId?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const wishlist = useWishlist();
+  const cart = useCart();
+  const saved = wishlist.ids.has(product.id);
+
   return (
-    <div className="flex flex-col rounded-lg border bg-white p-3 shadow-sm">
-      <Link
-        to={`/products/${product.id}${impressionId ? `?imp=${impressionId}` : ""}`}
-        onClick={() => logEvent({ event_type: "click", product_id: product.id, impression_id: impressionId })}
-        className="flex-1"
-      >
-        <ProductThumb product={product} />
-        <h3 className="mt-2 line-clamp-2 text-sm font-medium">{product.title}</h3>
-        <p className="text-xs text-gray-500">{product.brand ?? "Unknown brand"}</p>
-        <p className="mt-1 text-sm font-semibold">{formatPrice(product.price)}</p>
-      </Link>
-      {reasons && reasons.length > 0 && (
-        <>
-          <button onClick={() => setOpen(!open)} className="mt-2 self-start text-xs text-indigo-600 hover:underline">
-            {open ? "Hide" : "Why this?"}
-          </button>
-          {open && <ReasonList reasons={reasons} />}
-        </>
-      )}
+    <article className="group relative flex flex-col rounded-2xl bg-white p-3 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <div className="relative">
+        <Link
+          to={`/products/${product.id}${impressionId ? `?imp=${impressionId}` : ""}`}
+          state={{ reasons }}
+          onClick={() => logEvent({ event_type: "click", product_id: product.id, impression_id: impressionId })}
+          aria-label={product.title}
+        >
+          <ProductArt product={product} />
+        </Link>
+        <button
+          onClick={() => wishlist.toggle(product)}
+          aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+          aria-pressed={saved}
+          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition hover:scale-110"
+        >
+          <Heart size={15} className={saved ? "fill-oxblood text-oxblood" : ""} />
+        </button>
+        <button
+          onClick={() => cart.add(product)}
+          className="absolute bottom-2 right-2 flex h-8 items-center gap-1 rounded-full bg-ink px-3 text-xs font-medium text-ivory opacity-0 shadow-lift transition group-hover:opacity-100 focus:opacity-100"
+        >
+          <Plus size={13} /> Add
+        </button>
+      </div>
+
+      <div className="mt-3 flex flex-1 flex-col">
+        {reasons && reasons.length > 0 && (
+          <div className="mb-1.5 flex flex-wrap gap-1">
+            <ReasonChip reason={reasons[0]} />
+          </div>
+        )}
+        <Link to={`/products/${product.id}`} state={{ reasons }} className="line-clamp-2 text-sm font-medium leading-snug hover:text-camel-dark">
+          {product.title}
+        </Link>
+        <p className="mt-0.5 text-xs text-ink-muted">{product.brand ?? "Independent"}</p>
+        <p className="mt-auto pt-2 text-sm font-semibold">{formatPrice(product.price)}</p>
+
+        {reasons && reasons.length > 0 && (
+          <>
+            <button
+              onClick={() => setOpen(!open)}
+              className="mt-2 inline-flex items-center gap-1 self-start text-xs font-medium text-camel-dark hover:underline"
+              aria-expanded={open}
+            >
+              <Sparkles size={12} /> {open ? "Hide" : "Why this?"}
+            </button>
+            {open && (
+              <div className="mt-2 animate-fade-up">
+                <ReasonList reasons={reasons} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export function ProductCardSkeleton() {
+  return (
+    <div className="rounded-2xl bg-white p-3 shadow-card" aria-hidden="true">
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-sand">
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+      </div>
+      <div className="mt-3 h-3 w-4/5 rounded bg-sand" />
+      <div className="mt-2 h-3 w-1/2 rounded bg-sand" />
+      <div className="mt-4 h-3 w-1/4 rounded bg-sand" />
     </div>
   );
 }

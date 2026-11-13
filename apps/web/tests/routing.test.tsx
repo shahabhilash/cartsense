@@ -1,21 +1,22 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { cleanup, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "@/App";
+import { renderApp } from "./utils";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 describe("App routing", () => {
   it("renders the not-found page for unknown paths", () => {
-    // Pages fetch from the API on mount; keep the network out of unit tests
-    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
-    render(
-      <MemoryRouter initialEntries={["/does-not-exist"]}>
-        <App />
-      </MemoryRouter>,
-    );
-    expect(screen.getByText(/Page not found/)).toBeTruthy();
-    expect(screen.getByText("CartSense")).toBeTruthy(); // header is always present
-    vi.unstubAllGlobals();
+    renderApp(<App />, "/does-not-exist");
+    expect(screen.getByText("Page not found")).toBeTruthy();
+    expect(screen.getAllByText("SENSE").length).toBeGreaterThan(0); // logo in header and footer
+  });
+
+  it("shows an empty bag page", () => {
+    renderApp(<App />, "/cart");
+    expect(screen.getByText("Your bag is empty")).toBeTruthy();
   });
 });

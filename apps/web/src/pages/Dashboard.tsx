@@ -1,6 +1,37 @@
-import { useEffect, useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Activity, MousePointerClick, Sparkles, Target } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, type Analytics } from "@/lib/api";
+
+const INK = "#1B1814";
+const CAMEL = "#B88A5A";
+const SAND = "#D9C9AF";
+const OXBLOOD = "#8E1B26";
+
+function Kpi({ icon, label, value, note }: { icon: ReactNode; label: string; value: string; note?: string }) {
+  return (
+    <div className="rounded-3xl bg-white p-5 shadow-card">
+      <div className="flex items-center gap-2 text-ink-muted">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sand text-camel-dark">{icon}</span>
+        <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
+      </div>
+      <p className="mt-3 font-serif text-3xl">{value}</p>
+      {note && <p className="mt-1 text-xs text-ink-muted">{note}</p>}
+    </div>
+  );
+}
+
+function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-card">
+      <h2 className="text-xl">{title}</h2>
+      {subtitle && <p className="mt-1 text-xs text-ink-muted">{subtitle}</p>}
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+const tooltipStyle = { borderRadius: 12, border: "none", boxShadow: "0 8px 24px rgba(27,24,20,.15)", fontSize: 12 };
 
 export default function Dashboard() {
   const [data, setData] = useState<Analytics | null>(null);
@@ -10,89 +41,122 @@ export default function Dashboard() {
     api<Analytics>("/analytics/overview").then(setData).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!data) return <p>Loading…</p>;
-  const events = Object.entries(data.events_by_type).map(([type, count]) => ({ type, count }));
-  const offline = [...data.offline_metrics].sort((a, b) => Number(b["ndcg@10"]) - Number(a["ndcg@10"]));
+  if (error) return <p className="text-oxblood">{error}</p>;
+  if (!data)
+    return (
+      <div className="grid gap-4 sm:grid-cols-4" aria-hidden="true">
+        {Array.from({ length: 4 }, (_, i) => <div key={i} className="h-32 animate-pulse rounded-3xl bg-sand" />)}
+      </div>
+    );
+
+  const impressions = data.recommendation_stats.reduce((n, s) => n + s.impressions, 0);
+  const clicks = data.recommendation_stats.reduce((n, s) => n + s.clicks, 0);
+  const events = Object.entries(data.events_by_type).map(([type, count]) => ({ type: type.replace(/_/g, " "), count }));
+  const totalEvents = events.reduce((n, e) => n + e.count, 0);
+  const offline = [...data.offline_metrics]
+    .sort((a, b) => Number(b["ndcg@10"]) - Number(a["ndcg@10"]))
+    .map((m) => ({ ...m, model: String(m.model), ndcg: Number(m["ndcg@10"]) }) as Record<string, string | number> & {
+      model: string;
+      ndcg: number;
+    });
+  const best = offline[0];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">Analytics</h1>
-        <p className="text-sm text-gray-600">
-          Active model: {data.active_model_version ?? "none"} · live store activity only (synthetic events excluded)
+        <p className="eyebrow">Recommendation insights</p>
+        <h1 className="mt-1 text-4xl">How the recommender performs</h1>
+        <p className="mt-2 text-sm text-ink-muted">
+          Live store activity (real events only; synthetic events are excluded) and offline results on held-out reviews.
         </p>
       </div>
 
-      <section className="rounded-lg border bg-white p-4">
-        <h2 className="font-semibold">Recommendation click-through by model version</h2>
-        <table className="mt-3 w-full text-sm">
-          <thead>
-            <tr className="text-left text-gray-500">
-              <th>Version</th>
-              <th>Impressions</th>
-              <th>Clicks</th>
-              <th>CTR</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.recommendation_stats.map((s) => (
-              <tr key={s.model_version} className="border-t">
-                <td className="py-1">{s.model_version}</td>
-                <td>{s.impressions}</td>
-                <td>{s.clicks}</td>
-                <td>{(s.ctr * 100).toFixed(1)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {data.recommendation_stats.length === 0 && (
-          <p className="mt-2 text-sm text-gray-500">No impressions logged yet.</p>
-        )}
-      </section>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi icon={<Sparkles size={15} />} label="Active model" value={data.active_model_version?.replace("hybrid-", "Hybrid ") ?? "None"} note="Serving personal recommendations" />
+        <Kpi icon={<Target size={15} />} label="Impressions" value={impressions.toLocaleString()} note="Recommended products shown" />
+        <Kpi icon={<MousePointerClick size={15} />} label="Click-through" value={impressions ? `${((clicks / impressions) * 100).toFixed(1)}%` : "–"} note={`${clicks} ${clicks === 1 ? "click" : "clicks"} on recommendations`} />
+        <Kpi icon={<Activity size={15} />} label="Store events" value={totalEvents.toLocaleString()} note="Views, clicks, searches, saves" />
+      </div>
 
-      <section className="rounded-lg border bg-white p-4">
-        <h2 className="font-semibold">Store events by type</h2>
-        <div className="mt-3 h-64">
-          <ResponsiveContainer>
-            <BarChart data={events}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="type" fontSize={12} />
-              <YAxis allowDecimals={false} fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#4f46e5" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card title="Click-through by model version" subtitle="Each recommendation is logged with the model that produced it.">
+          {data.recommendation_stats.length === 0 ? (
+            <p className="text-sm text-ink-muted">No recommendations shown yet.</p>
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer>
+                <BarChart data={data.recommendation_stats.map((s) => ({ ...s, ctrPct: +(s.ctr * 100).toFixed(2) }))}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EFE6D8" />
+                  <XAxis dataKey="model_version" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis unit="%" fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "CTR"]} cursor={{ fill: "#F3EDE3" }} />
+                  <Bar dataKey="ctrPct" radius={[8, 8, 0, 0]}>
+                    {data.recommendation_stats.map((s, i) => <Cell key={s.model_version} fill={i === 0 ? INK : CAMEL} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </Card>
+
+        <Card title="Store activity" subtitle="Events logged by the store, by type.">
+          {events.length === 0 ? (
+            <p className="text-sm text-ink-muted">No activity yet. Browse the store to generate some.</p>
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer>
+                <BarChart data={events} layout="vertical" margin={{ left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EFE6D8" />
+                  <XAxis type="number" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis type="category" dataKey="type" fontSize={11} tickLine={false} axisLine={false} width={90} />
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#F3EDE3" }} />
+                  <Bar dataKey="count" fill={CAMEL} radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </Card>
+      </div>
 
       {offline.length > 0 && (
-        <section className="rounded-lg border bg-white p-4">
-          <h2 className="font-semibold">Offline evaluation (test period, K = 10)</h2>
-          <p className="text-xs text-gray-500">Computed by the evaluation scripts on held-out Amazon reviews.</p>
-          <table className="mt-3 w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500">
-                <th>Model</th>
-                <th>NDCG@10</th>
-                <th>Recall@10</th>
-                <th>MAP@10</th>
-                <th>Coverage@10</th>
-              </tr>
-            </thead>
-            <tbody>
-              {offline.map((m) => (
-                <tr key={String(m.model)} className="border-t">
-                  <td className="py-1">{m.model}</td>
-                  <td>{Number(m["ndcg@10"]).toFixed(4)}</td>
-                  <td>{Number(m["recall@10"]).toFixed(4)}</td>
-                  <td>{Number(m["map@10"]).toFixed(4)}</td>
-                  <td>{Number(m["coverage@10"]).toFixed(4)}</td>
+        <Card
+          title="Offline evaluation: NDCG@10 on the test period"
+          subtitle={`Computed by the evaluation scripts on held-out Amazon reviews.${best ? ` Best: ${best.model}.` : ""}`}
+        >
+          <div className="h-80">
+            <ResponsiveContainer>
+              <BarChart data={offline} layout="vertical" margin={{ left: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EFE6D8" />
+                <XAxis type="number" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis type="category" dataKey="model" fontSize={11} tickLine={false} axisLine={false} width={130} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toFixed(4), "NDCG@10"]} cursor={{ fill: "#F3EDE3" }} />
+                <Bar dataKey="ndcg" radius={[0, 8, 8, 0]}>
+                  {offline.map((m, i) => <Cell key={m.model} fill={i === 0 ? OXBLOOD : m.model.startsWith("random") ? SAND : CAMEL} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wider text-ink-muted">
+                  <th className="py-2">Model</th><th>NDCG@10</th><th>Recall@10</th><th>MAP@10</th><th>Coverage@10</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+              </thead>
+              <tbody>
+                {offline.map((m, i) => (
+                  <tr key={m.model} className={`border-t border-sand ${i === 0 ? "font-semibold" : ""}`}>
+                    <td className="py-2">{m.model}</td>
+                    <td>{Number(m["ndcg@10"]).toFixed(4)}</td>
+                    <td>{Number(m["recall@10"]).toFixed(4)}</td>
+                    <td>{Number(m["map@10"]).toFixed(4)}</td>
+                    <td>{Number(m["coverage@10"]).toFixed(4)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   );

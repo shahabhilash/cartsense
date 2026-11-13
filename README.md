@@ -33,6 +33,10 @@ by real click-through.
 - **Production-style serving.** Batch-precomputed recommendations, a
   lightweight API with no ML runtime, impression and click logging, and CTR
   per model version on an analytics dashboard.
+- **A store people can actually use.** Live search suggestions, recommendation
+  rails with labelled "Why this?" reasons, wishlist, a bag with a demo
+  checkout, recently viewed items, an account page with review history, and an
+  insights dashboard. It is responsive down to phone width.
 - **Reusable REST API.** Versioned (`/api/v1`) and validated, with an
   API-key endpoint for external stores.
 
