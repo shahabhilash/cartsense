@@ -4,14 +4,16 @@ Three strategies, tried in order:
 
 1. ``precomputed``: batch output of the active model version (the hybrid
    ranker) for users the model was trained on.
-2. ``session_similarity``: for users the model has not seen (new sign-ups),
-   items similar to what they viewed, clicked or wishlisted on the site,
-   from the precomputed ``similar_items`` table, plus a popularity tiebreak.
-   This is the item cold-start / new-user path and needs no ML runtime in the API.
-3. ``popular``: recent popularity for users with no signal at all.
+2. ``session_similarity``: for visitors the model has not seen (new sign-ups
+   and guests), items similar to what they viewed, clicked, added to the bag
+   or wishlisted, from the precomputed ``similar_items`` table. Guests are
+   identified by their browser session; a guest who signs in keeps the
+   signal from that session. Needs no ML runtime in the API.
+3. ``popular``: recent popularity for visitors with no signal at all.
 
-Every returned item is logged as an impression with the model version that
-produced it, so clicks can be attributed per version.
+When an A/B test is running, visitors in the control group always get
+``popular``. Every returned item is logged as an impression with the model
+version, the session and the A/B variant, so clicks can be attributed.
 """
 
 from __future__ import annotations
@@ -19,10 +21,12 @@ from __future__ import annotations
 import uuid
 from collections import defaultdict
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.db import Event, Impression, ModelVersion, Product, Recommendation, SimilarItem, User, WishlistItem
+from app.experiments import CONTROL, assign_variant, unit_id
 
 SESSION_STRATEGY_VERSION = "session-similarity-v1"
 POPULAR_STRATEGY_VERSION = "popular-v1"
@@ -57,15 +61,26 @@ def _popular(db: Session, k: int, exclude: set[str]) -> list[tuple[Product, floa
     return out
 
 
-def _session_similarity(db: Session, user: User, k: int, exclude: set[str]):
+def _session_similarity(db: Session, user: User | None, session_id: str | None, k: int, exclude: set[str]):
+    # Signal from the account and from this browser session (covers guests and
+    # a guest who has just signed in)
+    owners = []
+    if user is not None:
+        owners.append(Event.user_id == user.id)
+    if session_id:
+        owners.append(Event.session_id == session_id)
+    if not owners:
+        return []
     events = db.execute(
         select(Event.product_id, Event.event_type)
-        .where(Event.user_id == user.id, Event.product_id.is_not(None), Event.event_type.in_(SIGNAL_EVENTS),
+        .where(or_(*owners), Event.product_id.is_not(None), Event.event_type.in_(SIGNAL_EVENTS),
                Event.is_synthetic.is_(False))
         .order_by(Event.created_at.desc())
         .limit(50)
     ).all()
-    wished = list(db.scalars(select(WishlistItem.product_id).where(WishlistItem.user_id == user.id)))
+    wished = (
+        list(db.scalars(select(WishlistItem.product_id).where(WishlistItem.user_id == user.id))) if user else []
+    )
     signals: dict[str, float] = defaultdict(float)
     for pid, etype in events:
         signals[pid] += SIGNAL_WEIGHTS.get(etype, 1.0)
@@ -99,13 +114,24 @@ def _session_similarity(db: Session, user: User, k: int, exclude: set[str]):
     return out
 
 
-def recommend_for_user(db: Session, user: User | None, k: int, surface: str) -> dict:
+def recommend_for_user(
+    db: Session, user: User | None, k: int, surface: str, session_id: str | None = None
+) -> dict:
     exclude = _excluded_products(db, user)
     version = active_version(db)
     items: list[tuple[Product, float, list[dict]]] = []
     strategy, version_id = "popular", POPULAR_STRATEGY_VERSION
 
-    if user is not None and version is not None:
+    settings = get_settings()
+    unit = unit_id(user.id if user else None, session_id)
+    variant = (
+        assign_variant(unit, settings.ab_experiment, settings.ab_control_share)
+        if unit and settings.ab_control_share > 0
+        else None
+    )
+    personalise = variant != CONTROL
+
+    if personalise and user is not None and version is not None:
         rows = db.execute(
             select(Recommendation, Product)
             .join(Product, Product.id == Recommendation.product_id)
@@ -115,8 +141,8 @@ def recommend_for_user(db: Session, user: User | None, k: int, surface: str) -> 
         items = [(p, r.score, r.reasons) for r, p in rows if p.id not in exclude][:k]
         if items:
             strategy, version_id = "precomputed", version.id
-    if not items and user is not None:
-        items = _session_similarity(db, user, k, exclude)
+    if personalise and not items:
+        items = _session_similarity(db, user, session_id, k, exclude)
         if items:
             strategy, version_id = "session_similarity", SESSION_STRATEGY_VERSION
     if not items:
@@ -126,12 +152,14 @@ def recommend_for_user(db: Session, user: User | None, k: int, surface: str) -> 
     out = []
     for position, (product, score, reasons) in enumerate(items, start=1):
         impression = Impression(id=str(uuid.uuid4()), request_id=request_id, user_id=user.id if user else None,
-                                surface=surface, model_version=version_id, product_id=product.id, position=position)
+                                session_id=session_id, variant=variant, surface=surface,
+                                model_version=version_id, product_id=product.id, position=position)
         db.add(impression)
         out.append({"product": product, "rank": position, "score": float(score), "reasons": reasons,
                     "impression_id": impression.id})
     db.commit()
-    return {"request_id": request_id, "model_version": version_id, "strategy": strategy, "items": out}
+    return {"request_id": request_id, "model_version": version_id, "strategy": strategy, "variant": variant,
+            "items": out}
 
 
 def similar_products(db: Session, product_id: str, k: int) -> list[tuple[Product, float]]:

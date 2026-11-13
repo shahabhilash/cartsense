@@ -28,7 +28,28 @@ export type RecList = {
   request_id: string;
   model_version: string;
   strategy: "precomputed" | "session_similarity" | "popular";
+  variant: "control" | "treatment" | null;
   items: RecItem[];
+};
+
+export type VariantStats = {
+  variant: "control" | "treatment";
+  units: number;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  converted_units: number;
+  conversion_rate: number;
+};
+
+export type ABTest = {
+  experiment: string;
+  enabled: boolean;
+  control_share: number;
+  variants: VariantStats[];
+  ctr_lift: number | null;
+  ctr_p_value: number | null;
+  conversion_p_value: number | null;
 };
 
 export type User = { id: number; display_name: string; email: string | null; is_demo: boolean; demo_platform: string | null };
@@ -41,6 +62,7 @@ export type Analytics = {
   recommendation_stats: { model_version: string; impressions: number; clicks: number; ctr: number }[];
   active_model_version: string | null;
   offline_metrics: Record<string, string | number>[];
+  ab_test: ABTest;
 };
 
 const TOKEN_KEY = "cartsense_token";
@@ -64,7 +86,7 @@ export function setToken(token: string | null) {
   }
 }
 
-function sessionId(): string {
+export function sessionId(): string {
   try {
     let id = window.localStorage.getItem(SESSION_KEY);
     if (!id) {
@@ -89,6 +111,8 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      // Lets the API personalise for guests from their browsing in this session
+      "X-Session-Id": sessionId(),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },

@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     export_dir: Path = Path("../../artifacts/export")
     # Product images are hosted by Amazon; they are not shown unless enabled
     show_product_images: bool = False
+    # A/B test: share of visitors who get the popularity control (0 turns the test off)
+    ab_control_share: float = 0.0
+    ab_experiment: str = "hybrid-vs-popular"
 
     @field_validator("database_url")
     @classmethod

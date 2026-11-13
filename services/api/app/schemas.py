@@ -57,6 +57,7 @@ class RecommendationList(BaseModel):
     request_id: str
     model_version: str
     strategy: Literal["precomputed", "session_similarity", "popular"]
+    variant: Literal["control", "treatment"] | None = None
     items: list[RecommendedProduct]
 
 
@@ -127,12 +128,33 @@ class ModelStats(BaseModel):
     ctr: float
 
 
+class VariantStats(BaseModel):
+    variant: str
+    units: int
+    impressions: int
+    clicks: int
+    ctr: float
+    converted_units: int
+    conversion_rate: float
+
+
+class ABTest(BaseModel):
+    experiment: str
+    enabled: bool
+    control_share: float
+    variants: list[VariantStats]
+    ctr_lift: float | None
+    ctr_p_value: float | None
+    conversion_p_value: float | None
+
+
 class AnalyticsOverview(BaseModel):
     events_by_type: dict[str, int]
     events_by_day: list[dict[str, Any]]
     recommendation_stats: list[ModelStats]
     active_model_version: str | None
     offline_metrics: list[dict[str, Any]]
+    ab_test: ABTest
     synthetic_events_excluded: bool = True
 
 

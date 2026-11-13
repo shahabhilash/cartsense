@@ -1,7 +1,8 @@
 """Database engine, session factory and table definitions.
 
 Column types are portable (SQLite for development and tests, PostgreSQL in
-production). Tables are created on startup with ``create_all``.
+production). Tables are created on startup with ``create_all``, and new
+nullable columns are added to existing tables by ``add_missing_columns``.
 """
 
 from __future__ import annotations
@@ -11,6 +12,8 @@ from datetime import date, datetime, timezone
 
 from sqlalchemy import (
     JSON,
+    inspect,
+    text,
     Boolean,
     Date,
     DateTime,
@@ -142,6 +145,8 @@ class Impression(Base):
     model_version: Mapped[str] = mapped_column(String(64), index=True)
     product_id: Mapped[str] = mapped_column(ForeignKey("products.id"))
     position: Mapped[int] = mapped_column(Integer)
+    session_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    variant: Mapped[str | None] = mapped_column(String(20), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -171,8 +176,30 @@ engine = make_engine(get_settings().database_url)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
+def add_missing_columns(bind) -> list[str]:
+    """Additive schema upgrade: create nullable columns that exist in the
+    models but not yet in an existing database (``create_all`` only creates
+    missing tables). Works on SQLite and PostgreSQL; never drops or alters."""
+    inspector = inspect(bind)
+    added = []
+    with bind.begin() as conn:
+        for table in Base.metadata.sorted_tables:
+            if not inspector.has_table(table.name):
+                continue
+            existing = {c["name"] for c in inspector.get_columns(table.name)}
+            for column in table.columns:
+                if column.name in existing or not column.nullable:
+                    continue
+                ddl_type = column.type.compile(dialect=bind.dialect)
+                conn.execute(text(f'ALTER TABLE {table.name} ADD COLUMN {column.name} {ddl_type}'))
+                added.append(f"{table.name}.{column.name}")
+    return added
+
+
 def init_db(bind=None) -> None:
-    Base.metadata.create_all(bind or engine)
+    bind = bind or engine
+    Base.metadata.create_all(bind)
+    add_missing_columns(bind)
 
 
 def get_db() -> Iterator[Session]:

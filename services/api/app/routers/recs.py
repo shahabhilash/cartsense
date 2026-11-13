@@ -2,11 +2,13 @@
 
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.db import ApiClient, Event, Impression, Product, User, get_db
+from app.experiments import ab_results
 from app.recommend import active_version, recommend_for_user
 from app.routers.catalog import _hide_images
 from app.schemas import AnalyticsOverview, EventIn, EventOut, RecommendationList
@@ -25,10 +27,12 @@ def recommendations(
     k: int = Query(default=12, ge=1, le=20),
     surface: str = Query(default="home", pattern="^(home|product|cart|wishlist)$"),
     user: User | None = Depends(optional_user),
+    x_session_id: str | None = Header(default=None, max_length=64),
     db: Session = Depends(get_db),
 ):
-    """Personal recommendations for the signed-in user, popularity for guests."""
-    result = recommend_for_user(db, user, k, surface)
+    """Recommendations for the signed-in user or the guest's browser session
+    (sent as the X-Session-Id header)."""
+    result = recommend_for_user(db, user, k, surface, session_id=x_session_id)
     db.expunge_all()
     return _serialise(result)
 
@@ -72,8 +76,10 @@ def analytics(days: int = Query(default=14, ge=1, le=90), db: Session = Depends(
 
     version = active_version(db)
     offline = (version.details or {}).get("offline_metrics", []) if version else []
+    settings = get_settings()
     return {"events_by_type": by_type, "events_by_day": by_day, "recommendation_stats": stats,
-            "active_model_version": version.id if version else None, "offline_metrics": offline}
+            "active_model_version": version.id if version else None, "offline_metrics": offline,
+            "ab_test": ab_results(db, settings.ab_experiment, settings.ab_control_share)}
 
 
 @router.get("/partner/recommendations/{dataset_user_id}", response_model=RecommendationList)

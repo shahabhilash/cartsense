@@ -109,10 +109,21 @@ def load_export(db: Session, export_dir: Path, results_dir: Path | None = None) 
         db.execute(update(ModelVersion).where(ModelVersion.id == version["version"])
                    .values(is_active=True, details=version))
     db.flush()
+    # Store accounts appear as "site:<account id>" in the export
+    accounts = set(db.scalars(select(User.id).where(User.is_demo.is_(False))))
+
+    def target(uid: str) -> int | None:
+        if uid in user_ids:
+            return user_ids[uid]
+        if uid.startswith("site:") and uid[5:].isdigit() and int(uid[5:]) in accounts:
+            return int(uid[5:])
+        return None
+
     _bulk(db, Recommendation, [
-        {"user_id": user_ids[r.user_id], "model_version_id": version["version"], "rank": int(r.rank),
+        {"user_id": target(r.user_id), "model_version_id": version["version"], "rank": int(r.rank),
          "product_id": r.product_id, "score": float(r.score), "reasons": json.loads(r.reasons_json)}
         for r in recs.itertuples(index=False)
+        if target(r.user_id) is not None
     ])
     db.commit()
     return {"products": len(rows), "similar_items": len(similar), "demo_users": len(demo),

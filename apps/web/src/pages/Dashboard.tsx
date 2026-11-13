@@ -1,7 +1,7 @@
 import { Activity, Cpu, MousePointerClick, Target } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { api, type Analytics } from "@/lib/api";
+import { api, type ABTest, type Analytics } from "@/lib/api";
 
 const DARK = "#7A1426";
 const SOFT = "#C9A97E";
@@ -28,6 +28,63 @@ function Card({ title, subtitle, children }: { title: string; subtitle?: string;
       {subtitle && <p className="mt-1 text-xs text-ink-muted">{subtitle}</p>}
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+function pct(x: number) {
+  return `${(x * 100).toFixed(1)}%`;
+}
+
+function ABTestCard({ ab }: { ab: ABTest }) {
+  const [control, treatment] = ab.variants;
+  const total = control.impressions + treatment.impressions;
+  const verdict =
+    ab.ctr_p_value == null
+      ? "Not enough data for a significance test yet."
+      : ab.ctr_p_value < 0.05
+        ? `The difference in click-through is statistically significant (p = ${ab.ctr_p_value}).`
+        : `No significant difference in click-through yet (p = ${ab.ctr_p_value}); keep collecting data.`;
+  return (
+    <Card
+      title="A/B test: recommender vs. popularity"
+      subtitle={
+        ab.enabled
+          ? `Running. ${pct(ab.control_share)} of visitors see trending products (control), the rest see the trained model (treatment). Assignment is stable per visitor.`
+          : "Not running. Set CARTSENSE_AB_CONTROL_SHARE (e.g. 0.5) on the API to split visitors between the model and a popularity control."
+      }
+    >
+      {total === 0 ? (
+        <p className="text-sm text-ink-muted">No visitors have been assigned to a variant yet.</p>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wider text-ink-muted">
+                  <th className="py-2">Variant</th><th>Visitors</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>Added to bag</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ab.variants.map((v) => (
+                  <tr key={v.variant} className="border-t border-mist">
+                    <td className="py-2 font-medium">{v.variant === "control" ? "Control (popularity)" : "Treatment (model)"}</td>
+                    <td>{v.units}</td>
+                    <td>{v.impressions}</td>
+                    <td>{v.clicks}</td>
+                    <td>{pct(v.ctr)}</td>
+                    <td>{pct(v.conversion_rate)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-sm text-ink-soft">
+            {ab.ctr_lift != null && <>Click-through lift of the model over popularity: <strong>{pct(ab.ctr_lift)}</strong>. </>}
+            {verdict}
+          </p>
+        </>
+      )}
+    </Card>
   );
 }
 
@@ -77,6 +134,8 @@ export default function Dashboard() {
         <Kpi icon={<MousePointerClick size={15} />} label="Click-through" value={impressions ? `${((clicks / impressions) * 100).toFixed(1)}%` : "–"} note={`${clicks} ${clicks === 1 ? "click" : "clicks"} on recommendations`} />
         <Kpi icon={<Activity size={15} />} label="Store events" value={totalEvents.toLocaleString()} note="Views, clicks, searches, saves" />
       </div>
+
+      <ABTestCard ab={data.ab_test} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Click-through by model version" subtitle="Each recommendation is logged with the model that produced it.">
