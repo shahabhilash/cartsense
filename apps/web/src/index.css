@@ -7,15 +7,15 @@
     -webkit-font-smoothing: antialiased;
   }
   body {
-    @apply bg-ivory font-sans text-ink;
+    @apply bg-canvas font-sans text-ink;
   }
   h1,
   h2,
   h3 {
-    @apply font-serif tracking-tight;
+    @apply font-display font-bold tracking-tight;
   }
   :focus-visible {
-    @apply outline-none ring-2 ring-camel ring-offset-2 ring-offset-ivory;
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
   }
 }
 
@@ -25,20 +25,20 @@
       disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-ink text-ivory hover:bg-ink-soft;
+    @apply btn bg-ink text-canvas hover:bg-ink-soft;
   }
-  .btn-camel {
-    @apply btn bg-camel text-white hover:bg-camel-dark;
+  .btn-brand {
+    @apply btn bg-brand text-white hover:bg-brand-dark;
   }
   .btn-outline {
     @apply btn border border-ink/20 bg-white text-ink hover:border-ink;
   }
   .input {
-    @apply w-full rounded-full border border-sand-deep bg-white px-4 py-2.5 text-sm placeholder:text-ink-muted
-      focus:border-camel focus:outline-none focus:ring-2 focus:ring-camel/30;
+    @apply w-full rounded-full border border-mist-deep bg-white px-4 py-2.5 text-sm placeholder:text-ink-muted
+      focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30;
   }
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.2em] text-camel-dark;
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-brand;
   }
   .container-page {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6;

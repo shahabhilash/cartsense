@@ -13,12 +13,12 @@ import { useWishlist } from "@/state/wishlist";
 function DetailSkeleton() {
   return (
     <div className="grid gap-10 lg:grid-cols-2" aria-hidden="true">
-      <div className="aspect-square rounded-3xl bg-sand" />
+      <div className="aspect-square rounded-3xl bg-mist" />
       <div className="space-y-4">
-        <div className="h-4 w-24 rounded bg-sand" />
-        <div className="h-10 w-4/5 rounded bg-sand" />
-        <div className="h-6 w-32 rounded bg-sand" />
-        <div className="h-32 rounded bg-sand" />
+        <div className="h-4 w-24 rounded bg-mist" />
+        <div className="h-10 w-4/5 rounded bg-mist" />
+        <div className="h-6 w-32 rounded bg-mist" />
+        <div className="h-32 rounded bg-mist" />
       </div>
     </div>
   );
@@ -52,7 +52,7 @@ export default function ProductDetail() {
     window.scrollTo({ top: 0 });
   }, [id]);
 
-  if (error) return <p className="text-oxblood">{error}</p>;
+  if (error) return <p className="text-accent">{error}</p>;
   if (!product) return <DetailSkeleton />;
 
   const description = product.description ?? "";
@@ -85,25 +85,25 @@ export default function ProductDetail() {
             <h1 className="mt-2 text-3xl leading-tight sm:text-4xl">{product.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-ink-muted">
               <span className="inline-flex items-center gap-1">
-                <Star size={14} className="fill-camel text-camel" />
+                <Star size={14} className="fill-brand text-brand" />
                 {product.review_count.toLocaleString()} reviews
               </span>
               {product.popularity_rank && product.popularity_rank <= 500 && (
-                <span className="rounded-full bg-oxblood/10 px-2.5 py-0.5 text-xs font-medium text-oxblood">
+                <span className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
                   #{product.popularity_rank} trending
                 </span>
               )}
               {product.release_date && <span>Released {new Date(product.release_date).getFullYear()}</span>}
             </div>
 
-            <p className="mt-6 font-serif text-3xl">{formatPrice(product.price)}</p>
+            <p className="mt-6 font-display text-3xl">{formatPrice(product.price)}</p>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button onClick={() => cart.add(product)} className="btn-primary flex-1 py-3 sm:flex-none sm:px-10">
                 <ShoppingBag size={16} /> Add to bag
               </button>
               <button onClick={() => wishlist.toggle(product)} className="btn-outline py-3" aria-pressed={saved}>
-                <Heart size={16} className={saved ? "fill-oxblood text-oxblood" : ""} />
+                <Heart size={16} className={saved ? "fill-accent text-accent" : ""} />
                 {saved ? "Saved" : "Save"}
               </button>
             </div>
@@ -112,9 +112,9 @@ export default function ProductDetail() {
             </p>
 
             {reasons.length > 0 && (
-              <div className="mt-8 rounded-2xl border border-camel/30 bg-white p-4">
+              <div className="mt-8 rounded-2xl border border-brand/30 bg-white p-4">
                 <p className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold">
-                  <Sparkles size={15} className="text-camel-dark" /> Why we recommended this
+                  <Sparkles size={15} className="text-brand-dark" /> Why we recommended this
                 </p>
                 <ReasonList reasons={reasons} />
               </div>
@@ -126,7 +126,7 @@ export default function ProductDetail() {
                 <ul className="mt-3 space-y-2">
                   {product.features.slice(0, 6).map((f, i) => (
                     <li key={i} className="flex gap-2 text-sm text-ink-soft">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-camel" />
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                       {f}
                     </li>
                   ))}
@@ -141,7 +141,7 @@ export default function ProductDetail() {
                   {expanded || description.length <= 500 ? description : `${description.slice(0, 500)}…`}
                 </p>
                 {description.length > 500 && (
-                  <button onClick={() => setExpanded(!expanded)} className="mt-2 text-sm font-medium text-camel-dark hover:underline">
+                  <button onClick={() => setExpanded(!expanded)} className="mt-2 text-sm font-medium text-brand-dark hover:underline">
                     {expanded ? "Show less" : "Read more"}
                   </button>
                 )}

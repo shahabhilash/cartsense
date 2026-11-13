@@ -40,11 +40,11 @@ export function ProductCard({
           aria-pressed={saved}
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition hover:scale-110"
         >
-          <Heart size={15} className={saved ? "fill-oxblood text-oxblood" : ""} />
+          <Heart size={15} className={saved ? "fill-accent text-accent" : ""} />
         </button>
         <button
           onClick={() => cart.add(product)}
-          className="absolute bottom-2 right-2 flex h-8 items-center gap-1 rounded-full bg-ink px-3 text-xs font-medium text-ivory opacity-0 shadow-lift transition group-hover:opacity-100 focus:opacity-100"
+          className="absolute bottom-2 right-2 flex h-8 items-center gap-1 rounded-full bg-ink px-3 text-xs font-medium text-canvas opacity-0 shadow-lift transition group-hover:opacity-100 focus:opacity-100"
         >
           <Plus size={13} /> Add
         </button>
@@ -56,7 +56,7 @@ export function ProductCard({
             <ReasonChip reason={reasons[0]} />
           </div>
         )}
-        <Link to={`/products/${product.id}`} state={{ reasons }} className="line-clamp-2 text-sm font-medium leading-snug hover:text-camel-dark">
+        <Link to={`/products/${product.id}`} state={{ reasons }} className="line-clamp-2 text-sm font-medium leading-snug hover:text-brand-dark">
           {product.title}
         </Link>
         <p className="mt-0.5 text-xs text-ink-muted">{product.brand ?? "Independent"}</p>
@@ -66,7 +66,7 @@ export function ProductCard({
           <>
             <button
               onClick={() => setOpen(!open)}
-              className="mt-2 inline-flex items-center gap-1 self-start text-xs font-medium text-camel-dark hover:underline"
+              className="mt-2 inline-flex items-center gap-1 self-start text-xs font-medium text-brand-dark hover:underline"
               aria-expanded={open}
             >
               <Sparkles size={12} /> {open ? "Hide" : "Why this?"}
@@ -86,12 +86,12 @@ export function ProductCard({
 export function ProductCardSkeleton() {
   return (
     <div className="rounded-2xl bg-white p-3 shadow-card" aria-hidden="true">
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-sand">
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-mist">
         <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/50 to-transparent" />
       </div>
-      <div className="mt-3 h-3 w-4/5 rounded bg-sand" />
-      <div className="mt-2 h-3 w-1/2 rounded bg-sand" />
-      <div className="mt-4 h-3 w-1/4 rounded bg-sand" />
+      <div className="mt-3 h-3 w-4/5 rounded bg-mist" />
+      <div className="mt-2 h-3 w-1/2 rounded bg-mist" />
+      <div className="mt-4 h-3 w-1/4 rounded bg-mist" />
     </div>
   );
 }

@@ -1,24 +1,24 @@
 import type { Config } from "tailwindcss";
 
-// "Heritage" palette: camel, ink black, ivory and an oxblood accent
+// Slate + indigo palette: neutral surfaces, one brand colour, one sparing accent
 const config: Config = {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        ink: { DEFAULT: "#1B1814", soft: "#3A342D", muted: "#6F665B" },
-        ivory: { DEFAULT: "#FAF7F2", deep: "#F3EDE3" },
-        sand: { DEFAULT: "#E9DFCF", deep: "#D9C9AF" },
-        camel: { light: "#D7B48A", DEFAULT: "#B88A5A", dark: "#8C6239" },
-        oxblood: { DEFAULT: "#8E1B26", dark: "#6E141D" },
+        ink: { DEFAULT: "#0F172A", soft: "#334155", muted: "#64748B" },
+        canvas: { DEFAULT: "#F8FAFC", deep: "#F1F5F9" },
+        mist: { DEFAULT: "#E2E8F0", deep: "#CBD5E1" },
+        brand: { light: "#A5B4FC", DEFAULT: "#4F46E5", dark: "#4338CA" },
+        accent: { DEFAULT: "#E11D48", dark: "#BE123C" },
       },
       fontFamily: {
-        serif: ['"Playfair Display"', "Georgia", "serif"],
+        display: ['"Plus Jakarta Sans"', "Inter", "system-ui", "sans-serif"],
         sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(27,24,20,0.04), 0 8px 24px -12px rgba(27,24,20,0.18)",
-        lift: "0 2px 4px rgba(27,24,20,0.06), 0 18px 40px -16px rgba(27,24,20,0.30)",
+        card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.14)",
+        lift: "0 2px 4px rgba(15,23,42,0.05), 0 18px 40px -16px rgba(15,23,42,0.25)",
       },
       keyframes: {
         shimmer: { "100%": { transform: "translateX(100%)" } },

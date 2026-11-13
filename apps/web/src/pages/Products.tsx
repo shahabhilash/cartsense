@@ -49,7 +49,7 @@ export default function Products() {
 
   return (
     <div>
-      <div className="border-b border-sand pb-6">
+      <div className="border-b border-mist pb-6">
         <p className="eyebrow">{q ? "Search results" : "Shop"}</p>
         <h1 className="mt-1 text-4xl">{title}</h1>
         {data && <p className="mt-2 text-sm text-ink-muted">{data.total.toLocaleString()} products</p>}
@@ -59,7 +59,7 @@ export default function Products() {
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
           <button
             onClick={() => go({ platform: "", page: "1" })}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${!platform ? "border-ink bg-ink text-ivory" : "border-sand-deep bg-white hover:border-ink"}`}
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${!platform ? "border-ink bg-ink text-canvas" : "border-mist-deep bg-white hover:border-ink"}`}
           >
             All
           </button>
@@ -67,7 +67,7 @@ export default function Products() {
             <button
               key={p.platform}
               onClick={() => go({ platform: p.platform, page: "1" })}
-              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${platform === p.platform ? "border-ink bg-ink text-ivory" : "border-sand-deep bg-white hover:border-ink"}`}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-sm transition ${platform === p.platform ? "border-ink bg-ink text-canvas" : "border-mist-deep bg-white hover:border-ink"}`}
             >
               {p.platform}
             </button>
@@ -80,13 +80,13 @@ export default function Products() {
             </button>
           )}
           <select value={sort} onChange={(e) => go({ sort: e.target.value, page: "1" })} aria-label="Sort"
-            className="rounded-full border border-sand-deep bg-white px-4 py-2 text-sm focus:border-camel focus:outline-none">
+            className="rounded-full border border-mist-deep bg-white px-4 py-2 text-sm focus:border-brand focus:outline-none">
             {SORTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </div>
       </div>
 
-      {error && <p className="mt-6 text-sm text-oxblood">{error}</p>}
+      {error && <p className="mt-6 text-sm text-accent">{error}</p>}
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {data

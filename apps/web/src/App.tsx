@@ -40,7 +40,7 @@ export default function App() {
           <Route
             path="/dashboard"
             element={
-              <Suspense fallback={<div className="h-32 animate-pulse rounded-3xl bg-sand" />}>
+              <Suspense fallback={<div className="h-32 animate-pulse rounded-3xl bg-mist" />}>
                 <Dashboard />
               </Suspense>
             }

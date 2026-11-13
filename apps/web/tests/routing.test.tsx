@@ -12,7 +12,7 @@ describe("App routing", () => {
   it("renders the not-found page for unknown paths", () => {
     renderApp(<App />, "/does-not-exist");
     expect(screen.getByText("Page not found")).toBeTruthy();
-    expect(screen.getAllByText("SENSE").length).toBeGreaterThan(0); // logo in header and footer
+    expect(screen.getAllByText("Sense").length).toBeGreaterThan(0); // logo in header and footer
   });
 
   it("shows an empty bag page", () => {

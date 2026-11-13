@@ -3,19 +3,19 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, type Analytics } from "@/lib/api";
 
-const INK = "#1B1814";
-const CAMEL = "#B88A5A";
-const SAND = "#D9C9AF";
-const OXBLOOD = "#8E1B26";
+const DARK = "#0F172A";
+const SOFT = "#818CF8";
+const NEUTRAL = "#CBD5E1";
+const BRAND = "#4F46E5";
 
 function Kpi({ icon, label, value, note }: { icon: ReactNode; label: string; value: string; note?: string }) {
   return (
     <div className="rounded-3xl bg-white p-5 shadow-card">
       <div className="flex items-center gap-2 text-ink-muted">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sand text-camel-dark">{icon}</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-mist text-brand-dark">{icon}</span>
         <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
       </div>
-      <p className="mt-3 font-serif text-3xl">{value}</p>
+      <p className="mt-3 font-display text-3xl">{value}</p>
       {note && <p className="mt-1 text-xs text-ink-muted">{note}</p>}
     </div>
   );
@@ -31,7 +31,7 @@ function Card({ title, subtitle, children }: { title: string; subtitle?: string;
   );
 }
 
-const tooltipStyle = { borderRadius: 12, border: "none", boxShadow: "0 8px 24px rgba(27,24,20,.15)", fontSize: 12 };
+const tooltipStyle = { borderRadius: 12, border: "none", boxShadow: "0 8px 24px rgba(15,23,42,.12)", fontSize: 12 };
 
 export default function Dashboard() {
   const [data, setData] = useState<Analytics | null>(null);
@@ -41,11 +41,11 @@ export default function Dashboard() {
     api<Analytics>("/analytics/overview").then(setData).catch((e) => setError(e.message));
   }, []);
 
-  if (error) return <p className="text-oxblood">{error}</p>;
+  if (error) return <p className="text-accent">{error}</p>;
   if (!data)
     return (
       <div className="grid gap-4 sm:grid-cols-4" aria-hidden="true">
-        {Array.from({ length: 4 }, (_, i) => <div key={i} className="h-32 animate-pulse rounded-3xl bg-sand" />)}
+        {Array.from({ length: 4 }, (_, i) => <div key={i} className="h-32 animate-pulse rounded-3xl bg-mist" />)}
       </div>
     );
 
@@ -86,12 +86,12 @@ export default function Dashboard() {
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={data.recommendation_stats.map((s) => ({ ...s, ctrPct: +(s.ctr * 100).toFixed(2) }))}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EFE6D8" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                   <XAxis dataKey="model_version" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis unit="%" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "CTR"]} cursor={{ fill: "#F3EDE3" }} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "CTR"]} cursor={{ fill: "#F1F5F9" }} />
                   <Bar dataKey="ctrPct" radius={[8, 8, 0, 0]}>
-                    {data.recommendation_stats.map((s, i) => <Cell key={s.model_version} fill={i === 0 ? INK : CAMEL} />)}
+                    {data.recommendation_stats.map((s, i) => <Cell key={s.model_version} fill={i === 0 ? DARK : SOFT} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -106,11 +106,11 @@ export default function Dashboard() {
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={events} layout="vertical" margin={{ left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EFE6D8" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
                   <XAxis type="number" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis type="category" dataKey="type" fontSize={11} tickLine={false} axisLine={false} width={90} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#F3EDE3" }} />
-                  <Bar dataKey="count" fill={CAMEL} radius={[0, 8, 8, 0]} />
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#F1F5F9" }} />
+                  <Bar dataKey="count" fill={SOFT} radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -126,12 +126,12 @@ export default function Dashboard() {
           <div className="h-80">
             <ResponsiveContainer>
               <BarChart data={offline} layout="vertical" margin={{ left: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EFE6D8" />
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
                 <XAxis type="number" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis type="category" dataKey="model" fontSize={11} tickLine={false} axisLine={false} width={130} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toFixed(4), "NDCG@10"]} cursor={{ fill: "#F3EDE3" }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toFixed(4), "NDCG@10"]} cursor={{ fill: "#F1F5F9" }} />
                 <Bar dataKey="ndcg" radius={[0, 8, 8, 0]}>
-                  {offline.map((m, i) => <Cell key={m.model} fill={i === 0 ? OXBLOOD : m.model.startsWith("random") ? SAND : CAMEL} />)}
+                  {offline.map((m, i) => <Cell key={m.model} fill={i === 0 ? BRAND : m.model.startsWith("random") ? NEUTRAL : SOFT} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -145,7 +145,7 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {offline.map((m, i) => (
-                  <tr key={m.model} className={`border-t border-sand ${i === 0 ? "font-semibold" : ""}`}>
+                  <tr key={m.model} className={`border-t border-mist ${i === 0 ? "font-semibold" : ""}`}>
                     <td className="py-2">{m.model}</td>
                     <td>{Number(m["ndcg@10"]).toFixed(4)}</td>
                     <td>{Number(m["recall@10"]).toFixed(4)}</td>

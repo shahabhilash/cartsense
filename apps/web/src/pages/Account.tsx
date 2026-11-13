@@ -22,14 +22,14 @@ export default function Account() {
   if (!user)
     return (
       <EmptyState icon={<User size={24} />} title="Your account">
-        <Link to="/login" className="font-medium text-camel-dark underline">Sign in</Link> to see your profile.
+        <Link to="/login" className="font-medium text-brand-dark underline">Sign in</Link> to see your profile.
       </EmptyState>
     );
 
   return (
     <div className="space-y-10">
       <div className="flex flex-wrap items-center gap-5 rounded-3xl bg-white p-6 shadow-card">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink font-serif text-2xl text-ivory">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink font-display text-2xl text-canvas">
           {user.display_name.slice(0, 1).toUpperCase()}
         </span>
         <div>
@@ -38,8 +38,8 @@ export default function Account() {
           {user.email && <p className="text-sm text-ink-muted">{user.email}</p>}
         </div>
         <dl className="ml-auto flex gap-6 text-center">
-          <div><dt className="text-xs text-ink-muted">Recent reviews</dt><dd className="font-serif text-2xl">{history?.length ?? "–"}</dd></div>
-          <div><dt className="text-xs text-ink-muted">Saved</dt><dd className="font-serif text-2xl">{saved.length}</dd></div>
+          <div><dt className="text-xs text-ink-muted">Recent reviews</dt><dd className="font-display text-2xl">{history?.length ?? "–"}</dd></div>
+          <div><dt className="text-xs text-ink-muted">Saved</dt><dd className="font-display text-2xl">{saved.length}</dd></div>
         </dl>
       </div>
 
@@ -60,7 +60,7 @@ export default function Account() {
                   <p className="line-clamp-2 text-sm font-medium">{h.product.title}</p>
                   <p className="mt-1 flex items-center gap-0.5" aria-label={`${h.rating} out of 5 stars`}>
                     {Array.from({ length: 5 }, (_, i) => (
-                      <Star key={i} size={12} className={i < h.rating ? "fill-camel text-camel" : "text-sand-deep"} />
+                      <Star key={i} size={12} className={i < h.rating ? "fill-brand text-brand" : "text-mist-deep"} />
                     ))}
                   </p>
                   <p className="mt-0.5 text-xs text-ink-muted">{new Date(h.occurred_at).toLocaleDateString()}</p>

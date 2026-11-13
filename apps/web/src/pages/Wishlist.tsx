@@ -13,7 +13,7 @@ export default function Wishlist() {
   if (!user)
     return (
       <EmptyState icon={<Heart size={24} />} title="Save the things you love">
-        <Link to="/login" className="font-medium text-camel-dark underline">Sign in</Link> to keep a wishlist. Saved items
+        <Link to="/login" className="font-medium text-brand-dark underline">Sign in</Link> to keep a wishlist. Saved items
         also shape your recommendations.
       </EmptyState>
     );
@@ -26,7 +26,7 @@ export default function Wishlist() {
       {items.length === 0 ? (
         <div className="mt-8">
           <EmptyState icon={<Heart size={24} />} title="Nothing saved yet">
-            Tap the heart on any product. <Link to="/products" className="font-medium text-camel-dark underline">Browse the collection</Link>
+            Tap the heart on any product. <Link to="/products" className="font-medium text-brand-dark underline">Browse the collection</Link>
           </EmptyState>
         </div>
       ) : (

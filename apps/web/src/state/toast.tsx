@@ -27,10 +27,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         role="status" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id}
-            className="pointer-events-auto flex animate-fade-up items-center gap-3 rounded-2xl bg-ink px-4 py-3 text-sm text-ivory shadow-lift">
-            {t.tone === "success" ? <Check size={16} className="text-camel-light" /> : <Info size={16} className="text-camel-light" />}
+            className="pointer-events-auto flex animate-fade-up items-center gap-3 rounded-2xl bg-ink px-4 py-3 text-sm text-canvas shadow-lift">
+            {t.tone === "success" ? <Check size={16} className="text-brand-light" /> : <Info size={16} className="text-brand-light" />}
             <span className="flex-1">{t.message}</span>
-            <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-ivory/60 hover:text-ivory">
+            <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-canvas/60 hover:text-canvas">
               <X size={14} />
             </button>
           </div>

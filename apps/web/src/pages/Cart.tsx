@@ -13,7 +13,7 @@ export default function Cart() {
   if (cart.lines.length === 0)
     return (
       <EmptyState icon={<ShoppingBag size={24} />} title="Your bag is empty">
-        <Link to="/products" className="font-medium text-camel-dark underline">Discover the collection</Link>
+        <Link to="/products" className="font-medium text-brand-dark underline">Discover the collection</Link>
       </EmptyState>
     );
 
@@ -24,7 +24,7 @@ export default function Cart() {
       <p className="eyebrow">Checkout</p>
       <h1 className="mt-1 text-4xl">Your bag</h1>
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <ul className="divide-y divide-sand rounded-3xl bg-white px-6 shadow-card">
+        <ul className="divide-y divide-mist rounded-3xl bg-white px-6 shadow-card">
           {cart.lines.map((l) => <CartLineRow key={l.product.id} line={l} />)}
         </ul>
         <aside className="h-fit rounded-3xl bg-white p-6 shadow-card lg:sticky lg:top-36">
@@ -34,7 +34,7 @@ export default function Cart() {
             <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(cart.subtotal)}</dd></div>
             <div className="flex justify-between text-ink-muted"><dt>Shipping</dt><dd>Free</dd></div>
           </dl>
-          <div className="mt-4 flex justify-between border-t border-sand pt-4 font-serif text-xl">
+          <div className="mt-4 flex justify-between border-t border-mist pt-4 font-display text-xl">
             <span>Total</span>
             <span>{formatPrice(cart.subtotal)}</span>
           </div>

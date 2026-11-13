@@ -27,26 +27,27 @@ const STRATEGY: Record<RecList["strategy"], { eyebrow: string; title: string; su
 
 function Hero({ signedIn }: { signedIn: boolean }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] bg-ink text-ivory">
-      <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-camel/30 blur-3xl" />
-      <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-oxblood/30 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] bg-ink text-canvas">
+      <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand/40 blur-3xl" />
+      <div className="absolute -bottom-32 left-1/4 h-80 w-80 rounded-full bg-violet-500/25 blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:22px_22px]" />
       <div className="relative grid gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.3fr_1fr] lg:items-center">
         <div>
-          <p className="eyebrow text-camel-light">The explainable game store</p>
+          <p className="eyebrow text-brand-light">The explainable game store</p>
           <h1 className="mt-3 text-4xl leading-tight sm:text-5xl lg:text-6xl">
             Games chosen for you,<br />
-            <span className="italic text-camel-light">and the reason why.</span>
+            <span className="bg-gradient-to-r from-brand-light via-violet-300 to-sky-300 bg-clip-text text-transparent">and the reason why.</span>
           </h1>
-          <p className="mt-5 max-w-lg text-ivory/70">
+          <p className="mt-5 max-w-lg text-canvas/70">
             25,000+ titles and accessories. Recommendations come from a model trained on 814,000 real reviews, and
             every one tells you what it was based on.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/products" className="btn bg-ivory text-ink hover:bg-sand">
+            <Link to="/products" className="btn bg-canvas text-ink hover:bg-mist">
               Shop the collection <ArrowRight size={16} />
             </Link>
             {!signedIn && (
-              <Link to="/login" className="btn border border-ivory/30 text-ivory hover:border-ivory">
+              <Link to="/login" className="btn border border-canvas/30 text-canvas hover:border-canvas">
                 <Sparkles size={16} /> Try a demo shopper
               </Link>
             )}
@@ -58,9 +59,9 @@ function Hero({ signedIn }: { signedIn: boolean }) {
             ["4", "models combined by a learned ranker"],
             ["100%", "of recommendations explained"],
           ].map(([value, label]) => (
-            <div key={label} className="rounded-2xl border border-ivory/10 bg-ivory/5 p-4">
-              <dt className="font-serif text-3xl text-camel-light">{value}</dt>
-              <dd className="mt-1 text-xs text-ivory/60">{label}</dd>
+            <div key={label} className="rounded-2xl border border-canvas/10 bg-canvas/5 p-4">
+              <dt className="font-display text-3xl font-extrabold text-white">{value}</dt>
+              <dd className="mt-1 text-xs text-canvas/60">{label}</dd>
             </div>
           ))}
         </dl>
@@ -97,10 +98,10 @@ export default function Home() {
         eyebrow={meta.eyebrow}
         title={meta.title}
         subtitle={meta.subtitle}
-        action={recs && <span className="rounded-full bg-sand px-3 py-1 text-[11px] text-ink-soft">model · {recs.model_version}</span>}
+        action={recs && <span className="rounded-full bg-mist px-3 py-1 text-[11px] text-ink-soft">model · {recs.model_version}</span>}
       >
         {error ? (
-          <p className="text-sm text-oxblood">Could not load recommendations: {error}</p>
+          <p className="text-sm text-accent">Could not load recommendations: {error}</p>
         ) : (
           <Rail loading={!recs}>
             {recs?.items.map((r) => (
@@ -130,13 +131,13 @@ export default function Home() {
             <Link
               key={p.platform}
               to={`/products?platform=${encodeURIComponent(p.platform)}`}
-              className={`group flex flex-col justify-between rounded-2xl p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-lift ${
-                i % 3 === 0 ? "bg-camel text-white" : i % 3 === 1 ? "bg-white" : "bg-sand"
+              className={`group flex flex-col justify-between rounded-2xl border p-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand hover:shadow-lift ${
+                i === 0 ? "border-transparent bg-gradient-to-br from-brand to-violet-600 text-white" : "border-mist bg-white"
               }`}
             >
-              <Gamepad2 size={20} className="opacity-70" />
+              <Gamepad2 size={20} className={i === 0 ? "opacity-80" : "text-brand"} />
               <div className="mt-6">
-                <p className="font-serif text-lg leading-tight">{p.platform}</p>
+                <p className="font-display text-lg leading-tight">{p.platform}</p>
                 <p className="mt-1 text-xs opacity-70">{p.products.toLocaleString()} products</p>
               </div>
             </Link>
@@ -145,7 +146,7 @@ export default function Home() {
       </Section>
 
       {user && (
-        <Section eyebrow="Everyone is playing" title="Bestsellers" action={<Link to="/products" className="text-sm font-medium text-camel-dark hover:underline">View all</Link>}>
+        <Section eyebrow="Everyone is playing" title="Bestsellers" action={<Link to="/products" className="text-sm font-medium text-brand-dark hover:underline">View all</Link>}>
           <Rail loading={!trending}>
             {trending?.map((p) => (
               <RailItem key={p.id}>
