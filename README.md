@@ -147,23 +147,6 @@ Interactive documentation is served at `/docs`. Main endpoints (prefix `/api/v1`
 
 Errors use one format: `{"error": {"code": 404, "message": "..."}}`.
 
-## Testing
-
-```bash
-cd ml && pytest                  # 99 tests: data pipeline, metrics, models, hybrid, experiments, store feedback
-cd services/api && pytest        # 32 tests: endpoints, auth, guest sessions, A/B test, CTR tracking, loader, schema upgrade
-cd apps/web && npm test          # 9 tests: components, bag, wishlist, routing
-```
-
-All three suites run in GitHub Actions on every push.
-
-## Deployment
-
-The store is a static React build that deploys to **Vercel** or Netlify. The
-API and PostgreSQL deploy to **Render** (or Railway). Setup, local
-development and hosted deployment are covered in
-[docs/deployment.md](docs/deployment.md).
-
 ## Data and attribution
 
 CartSense uses the Amazon Reviews 2023 dataset from the McAuley Lab, UC San Diego:
