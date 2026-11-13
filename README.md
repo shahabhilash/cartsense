@@ -40,12 +40,6 @@ by real click-through.
 - **Reusable REST API.** Versioned (`/api/v1`) and validated, with an
   API-key endpoint for external stores.
 
-## Screenshots
-
-| Recommended for you + "Why this?" | Product page | Analytics dashboard |
-|---|---|---|
-| _add `docs/screenshots/home.png`_ | _add `docs/screenshots/product.png`_ | _add `docs/screenshots/dashboard.png`_ |
-
 ## Results
 
 Offline evaluation on the **test period (2021-07 → 2023-09)**: 25,013 users
@@ -117,45 +111,6 @@ cartsense/
 └── docker-compose.yml
 ```
 
-## Getting started
-
-**Prerequisites:** Python 3.10+, Node.js 20+. Docker is optional, for the
-PostgreSQL stack.
-
-```bash
-# 1. Python environment
-python -m venv .venv
-.venv/Scripts/activate                    # Windows; use .venv/bin/activate on macOS/Linux
-pip install -e "ml[dev]" -e "services/api[dev]"
-
-# 2. Data and model (downloads the dataset from its official source)
-python -m cartsense_ml.data.pipeline                      # about 1 minute
-python -m cartsense_ml.export --out artifacts/export      # about 30 minutes on a laptop CPU
-
-# 3. API (SQLite by default)
-cd services/api
-python -m app.load_data --export-dir ../../artifacts/export --results-dir ../../reports/results/test
-uvicorn app.main:app --port 8000          # interactive docs: http://localhost:8000/docs
-
-# 4. Store (new terminal)
-cd apps/web
-npm install
-npm run dev                               # http://localhost:3000
-```
-
-On the sign-in page, choose a **demo shopper** (a real, anonymised dataset
-user) to see personal recommendations, or create an account and browse a few
-products to see the cold-start path.
-
-To reproduce the evaluation:
-
-```bash
-python -m cartsense_ml.experiments.run --config ml/configs/baselines.yaml --stage test
-python -m cartsense_ml.experiments.run --config ml/configs/p3_models.yaml --stage test
-python -m cartsense_ml.experiments.run --config ml/configs/p4_models.yaml --stage test
-mlflow ui --backend-store-uri sqlite:///mlruns.db
-```
-
 ## API overview
 
 Interactive documentation is served at `/docs`. Main endpoints (prefix `/api/v1`):
@@ -177,18 +132,18 @@ Errors use one format: `{"error": {"code": 404, "message": "..."}}`.
 
 ```bash
 cd ml && pytest                  # 93 tests: data pipeline, metrics, models, hybrid, experiments
-cd services/api && pytest        # 13 tests: endpoints, auth, cold start, CTR tracking, loader
-cd apps/web && npm test          # component tests
+cd services/api && pytest        # 23 tests: endpoints, auth, cold start, CTR tracking, loader, config
+cd apps/web && npm test          # 9 tests: components, bag, wishlist, routing
 ```
 
 All three suites run in GitHub Actions on every push.
 
 ## Deployment
 
-The store is a static React build that deploys to **Vercel** or Netlify.
-The API and PostgreSQL deploy to **Render** (or Railway). The step-by-step guide, including loading data into a hosted
-database, is in [docs/deployment.md](docs/deployment.md). Local PostgreSQL:
-`docker compose up --build`.
+The store is a static React build that deploys to **Vercel** or Netlify. The
+API and PostgreSQL deploy to **Render** (or Railway). Setup, local
+development and hosted deployment are covered in
+[docs/deployment.md](docs/deployment.md).
 
 ## Data and attribution
 
