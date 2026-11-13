@@ -43,13 +43,17 @@ against the container's database instead (step 4.3 with the local URL).
 2. **API:** create a Render *Web Service* from this repository.
    * Root directory `services/api`, runtime Docker (uses the `Dockerfile`).
    * Environment variables:
-     * `CARTSENSE_DATABASE_URL`: the database URL, with the scheme changed to `postgresql+psycopg://`
+     * `CARTSENSE_DATABASE_URL`: the database URL, pasted as Render shows it.
+       Use the *Internal* URL only if the API and database are in the same
+       region; otherwise use the *External* URL. The API converts
+       `postgres://` to the driver it needs, retries while the database
+       starts, and logs the reason (without the password) if it cannot connect.
      * `CARTSENSE_JWT_SECRET`: a long random string
      * `CARTSENSE_CORS_ORIGINS`: your Vercel URL, e.g. `https://cartsense.vercel.app`
 3. **Load data:** from your machine, point the loader at the hosted database:
    ```bash
    cd services/api
-   CARTSENSE_DATABASE_URL="postgresql+psycopg://...external-url..." \
+   CARTSENSE_DATABASE_URL="...External Database URL, as shown by Render..." \
      python -m app.load_data --export-dir ../../artifacts/export --results-dir ../../reports/results/test
    ```
    With 2,000 demo users, the export is roughly 25k products, about 250k
