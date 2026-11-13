@@ -3,10 +3,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, type Analytics } from "@/lib/api";
 
-const DARK = "#6B0F2A";
-const SOFT = "#C98A4B";
-const NEUTRAL = "#D19E66";
-const BRAND = "#8A1538";
+const DARK = "#9B0C23";
+const SOFT = "#C9A97E";
+const NEUTRAL = "#DCCBB1";
+const BRAND = "#C8102E";
 
 function Kpi({ icon, label, value, note }: { icon: ReactNode; label: string; value: string; note?: string }) {
   return (
@@ -86,10 +86,10 @@ export default function Dashboard() {
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={data.recommendation_stats.map((s) => ({ ...s, ctrPct: +(s.ctr * 100).toFixed(2) }))}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAC9A0" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EDE3D3" />
                   <XAxis dataKey="model_version" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis unit="%" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "CTR"]} cursor={{ fill: "#EBCDA6" }} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "CTR"]} cursor={{ fill: "#F3ECE1" }} />
                   <Bar dataKey="ctrPct" radius={[8, 8, 0, 0]}>
                     {data.recommendation_stats.map((s, i) => <Cell key={s.model_version} fill={i === 0 ? DARK : SOFT} />)}
                   </Bar>
@@ -106,10 +106,10 @@ export default function Dashboard() {
             <div className="h-64">
               <ResponsiveContainer>
                 <BarChart data={events} layout="vertical" margin={{ left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EAC9A0" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EDE3D3" />
                   <XAxis type="number" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis type="category" dataKey="type" fontSize={11} tickLine={false} axisLine={false} width={90} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#EBCDA6" }} />
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#F3ECE1" }} />
                   <Bar dataKey="count" fill={SOFT} radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -126,10 +126,10 @@ export default function Dashboard() {
           <div className="h-80">
             <ResponsiveContainer>
               <BarChart data={offline} layout="vertical" margin={{ left: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EAC9A0" />
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EDE3D3" />
                 <XAxis type="number" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis type="category" dataKey="model" fontSize={11} tickLine={false} axisLine={false} width={130} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toFixed(4), "NDCG@10"]} cursor={{ fill: "#EBCDA6" }} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toFixed(4), "NDCG@10"]} cursor={{ fill: "#F3ECE1" }} />
                 <Bar dataKey="ndcg" radius={[0, 8, 8, 0]}>
                   {offline.map((m, i) => <Cell key={m.model} fill={i === 0 ? BRAND : m.model.startsWith("random") ? NEUTRAL : SOFT} />)}
                 </Bar>
