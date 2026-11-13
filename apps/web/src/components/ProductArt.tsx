@@ -6,9 +6,9 @@ import type { Product } from "@/lib/api";
 // Muted gradients per platform, in the same warm family as the UI
 const PALETTES: Record<string, [string, string, string]> = {
   PC: ["#292524", "#44403C", "#E8B98A"],
-  "Nintendo Switch": ["#9B0C23", "#C8102E", "#FDECEF"],
+  "Nintendo Switch": ["#7A1426", "#9E1B32", "#FDECEF"],
   "PlayStation 4": ["#1E2A44", "#33476B", "#F5F5F4"],
-  "PlayStation 5": ["#F3ECE1", "#FBF7F0", "#C8102E"],
+  "PlayStation 5": ["#F3ECE1", "#FBF7F0", "#9E1B32"],
   "Xbox One": ["#22382C", "#3B5A45", "#F5F5F4"],
   "Xbox Series X & S": ["#1F3326", "#365940", "#E8B98A"],
   "Legacy Systems": ["#A88658", "#C9A97E", "#FBF7F0"],

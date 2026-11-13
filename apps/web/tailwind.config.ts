@@ -10,7 +10,7 @@ const config: Config = {
         canvas: { DEFAULT: "#F3ECE1", deep: "#EDE3D3" },
         surface: "#FBF7F0",
         mist: { DEFAULT: "#EDE3D3", deep: "#DCCBB1" },
-        brand: { light: "#F7B5C0", DEFAULT: "#C8102E", dark: "#9B0C23" },
+        brand: { light: "#EBC1C7", DEFAULT: "#9E1B32", dark: "#7A1426" },
         accent: { light: "#EAD9BF", DEFAULT: "#C9A97E", dark: "#A88658" },
       },
       fontFamily: {

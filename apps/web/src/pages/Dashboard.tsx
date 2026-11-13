@@ -3,10 +3,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, type Analytics } from "@/lib/api";
 
-const DARK = "#9B0C23";
+const DARK = "#7A1426";
 const SOFT = "#C9A97E";
 const NEUTRAL = "#DCCBB1";
-const BRAND = "#C8102E";
+const BRAND = "#9E1B32";
 
 function Kpi({ icon, label, value, note }: { icon: ReactNode; label: string; value: string; note?: string }) {
   return (
